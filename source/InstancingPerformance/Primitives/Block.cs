@@ -27,16 +27,22 @@ namespace InstancingPerformance.Primitives
 			return l.Solid != r.Solid || l.Color != r.Color;
 		}
 
-		public void MeshData(int x, int y, int z, MeshData meshData)
+		public void MeshData(Primitives.Chunk chunk, int x, int y, int z, MeshData meshData)
 		{
 			if (Solid)
 			{
-				FaceDataUp(x, y, z, meshData);
-				FaceDataDown(x, y, z, meshData);
-				FaceDataNorth(x, y, z, meshData);
-				FaceDataSouth(x, y, z, meshData);
-				FaceDataEast(x, y, z, meshData);
-				FaceDataWest(x, y, z, meshData);
+				if (!chunk.GetBlock(new Vector3(x, y + 1, z)).Solid)
+					FaceDataUp(x, y, z, meshData);
+				if (!chunk.GetBlock(new Vector3(x, y - 1, z)).Solid)
+					FaceDataDown(x, y, z, meshData);
+				if (!chunk.GetBlock(new Vector3(x, y, z + 1)).Solid)
+					FaceDataNorth(x, y, z, meshData);
+				if (!chunk.GetBlock(new Vector3(x, y, z - 1)).Solid)
+					FaceDataSouth(x, y, z, meshData);
+				if (!chunk.GetBlock(new Vector3(x + 1, y, z)).Solid)
+					FaceDataEast(x, y, z, meshData);
+				if (!chunk.GetBlock(new Vector3(x - 1, y, z)).Solid)
+					FaceDataWest(x, y, z, meshData);
 			}
 		}
 

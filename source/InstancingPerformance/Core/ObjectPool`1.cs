@@ -40,6 +40,7 @@ namespace InstancingPerformance.Core
 		{
 			_active.Remove(item.Key);
 			_objects.Add(item);
+			item.Reset();
 		}
 
 		public void UpdateObjects()

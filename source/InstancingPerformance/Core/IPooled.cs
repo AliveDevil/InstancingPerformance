@@ -9,5 +9,6 @@ namespace InstancingPerformance.Core
 	{
 		T Key { get; set; }
 		bool IsActive { get; }
+		void Reset();
 	}
 }

@@ -42,7 +42,7 @@ namespace InstancingPerformance.Primitives
 				for (int i = 0; i < Length; i++)
 				{
 					Vector3 v = i.ResolveIndex(ChunkSize, ChunkSize, ChunkSize);
-					blocks[i].MeshData((int)v.X, (int)v.Y, (int)v.Z, MeshData);
+					blocks[i].MeshData(this, (int)v.X, (int)v.Y, (int)v.Z, MeshData);
 				}
 			}
 		}

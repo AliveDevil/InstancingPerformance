@@ -8,17 +8,23 @@ namespace InstancingPerformance.Voxel
 {
 	public class Chunk : AppObject, IDraw, IUpdate, IPooled<Vector3>
 	{
-		public Vector3 Position { get; set; }
-		public Vector3 WorldPosition { get { return Position * world.ChunkSize; } }
-		public Primitives.Chunk ActiveChunk { get; private set; }
 		private Buffer indexBuffer;
+
 		private Buffer instanceBuffer;
+
 		private MeshData meshData;
+
 		private bool updateRequired = true;
+
 		private VertexBufferBinding vertexBinding;
+
 		private Buffer vertexBuffer;
+
 		private int vertexStride;
+
 		private World world;
+
+		public Primitives.Chunk ActiveChunk { get; private set; }
 
 		public bool IsActive
 		{
@@ -30,6 +36,10 @@ namespace InstancingPerformance.Voxel
 			get { return Position; }
 			set { Position = value; }
 		}
+
+		public Vector3 Position { get; set; }
+
+		public Vector3 WorldPosition { get { return Position * world.ChunkSize; } }
 
 		public Chunk(World world)
 			: base(world.App)
@@ -51,6 +61,16 @@ namespace InstancingPerformance.Voxel
 				Context.InputAssembler.SetIndexBuffer(indexBuffer, Format.R32_SInt, 0);
 				Context.DrawIndexed(ActiveChunk.MeshData.Triangles.Count, 0, 0);
 			}
+		}
+
+		public override int GetHashCode()
+		{
+			return Position.GetHashCode();
+		}
+
+		public void Reset()
+		{
+			ResetBuffer();
 		}
 
 		public void SetChunk(Primitives.Chunk chunk)
@@ -78,9 +98,7 @@ namespace InstancingPerformance.Voxel
 
 		private void RenderMesh()
 		{
-			Utilities.Dispose(ref vertexBuffer);
-			Utilities.Dispose(ref instanceBuffer);
-			Utilities.Dispose(ref indexBuffer);
+			ResetBuffer();
 
 			if (ActiveChunk != null && ActiveChunk.MeshData.VertexCount > 0)
 			{
@@ -89,15 +107,17 @@ namespace InstancingPerformance.Voxel
 			}
 		}
 
+		private void ResetBuffer()
+		{
+			Utilities.Dispose(ref vertexBuffer);
+			Utilities.Dispose(ref instanceBuffer);
+			Utilities.Dispose(ref indexBuffer);
+		}
+
 		private void UpdateChunk()
 		{
 			if (ActiveChunk != null)
 				ActiveChunk.BuildMesh();
-		}
-
-		public override int GetHashCode()
-		{
-			return Position.GetHashCode();
 		}
 	}
 }
