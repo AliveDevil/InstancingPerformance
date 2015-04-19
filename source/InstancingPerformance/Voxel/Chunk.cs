@@ -9,19 +9,12 @@ namespace InstancingPerformance.Voxel
 	public class Chunk : AppObject, IDraw, IUpdate, IPooled<Vector3>
 	{
 		private Buffer indexBuffer;
-
 		private Buffer instanceBuffer;
-
 		private MeshData meshData;
-
 		private bool updateRequired = true;
-
 		private VertexBufferBinding vertexBinding;
-
 		private Buffer vertexBuffer;
-
 		private int vertexStride;
-
 		private World world;
 
 		public Primitives.Chunk ActiveChunk { get; private set; }
