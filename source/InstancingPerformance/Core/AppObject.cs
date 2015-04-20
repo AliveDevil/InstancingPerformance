@@ -3,6 +3,7 @@ using System.Runtime.Remoting.Contexts;
 using InstancingPerformance.Content;
 using InstancingPerformance.Screens;
 using SharpDX.Direct3D11;
+using SharpDX.DirectInput;
 using SharpDX.DXGI;
 using Device = SharpDX.Direct3D11.Device;
 
@@ -16,13 +17,19 @@ namespace InstancingPerformance.Core
 
 		public Device Device { get { return Context.Device; } }
 
+		public Keyboard Keyboard { get { return App.Keyboard; } }
+
+		public KeyboardState KeyState { get { return App.KeyState; } }
+
+		public Mouse Mouse { get { return App.Mouse; } }
+
+		public MouseState MouseState { get { return App.MouseState; } }
+
 		public ResourceManager ResourceManager { get { return App.ResourceManager; } }
 
 		public ScreenManager ScreenManager { get { return App.ScreenManager; } }
 
 		public SwapChain SwapChain { get { return App.SwapChain; } }
-
-		public ServiceRegistry Services { get { return App.Services; } }
 
 		public AppObject(App app)
 		{

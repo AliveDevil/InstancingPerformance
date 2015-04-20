@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using InstancingPerformance.Core;
 using InstancingPerformance.Primitives;
 using SharpDX;
@@ -8,20 +9,27 @@ namespace InstancingPerformance.Voxel
 {
 	public class World : AppObject, IDraw, IUpdate
 	{
+		private HashSet<Action> bufferedActions;
 		private ObjectPool<Voxel.Chunk, Vector3> chunkPool;
 		private Dictionary<Vector3, Primitives.Chunk> map;
 
-		public Vector3 LoadReference { get; set; }
-
 		public int ChunkSize { get; private set; }
 
+		public Vector3 LoadReference { get; set; }
+
+		public int MapChunkCount { get { return map.Count; } }
+
 		public int ViewDistance { get; private set; }
+
+		public Vector3 ViewModifier { get { return new Vector3(ViewDistance, ViewDistance, ViewDistance); } }
+
+		public int DrawChunkCount { get { return chunkPool.ActiveObjects.Count(chunk => chunk.CanDraw()); } }
+
+		public int TriangleCount { get { return chunkPool.ActiveObjects.Select(c => c.TriangleCount).Sum(); } }
 
 		private int FullViewDistance { get { return ViewDistance * 2 + 1; } }
 
 		private int FullViewLength { get { return FullViewDistance * FullViewDistance * FullViewDistance; } }
-
-		public Vector3 ViewModifier { get { return new Vector3(ViewDistance, ViewDistance, ViewDistance); } }
 
 		public World(App app, int chunkSize, int viewDistance)
 			: base(app)
@@ -30,6 +38,7 @@ namespace InstancingPerformance.Voxel
 			ViewDistance = viewDistance;
 			map = new Dictionary<Vector3, Primitives.Chunk>();
 			chunkPool = new ObjectPool<Voxel.Chunk, Vector3>(() => new Chunk(this));
+			bufferedActions = new HashSet<Action>();
 		}
 
 		public void Draw(double time)
@@ -63,7 +72,7 @@ namespace InstancingPerformance.Voxel
 				chunk = new Primitives.Chunk(chunkIndex, ChunkSize);
 				map.Add(chunkIndex, chunk);
 			}
-			chunk.SetBlock(position.Mod(ChunkSize), Block.Green);
+			chunk.SetBlock(position.Mod(ChunkSize), block);
 		}
 
 		public void SetBlocks(IEnumerable<BlockInsert> inserts)
@@ -76,28 +85,28 @@ namespace InstancingPerformance.Voxel
 
 		public void Update(double time)
 		{
-			var alteredChunk = map.FirstOrDefault(kvp => kvp.Value.Altered).Value;
-			if (alteredChunk != null)
-				alteredChunk.BuildMesh();
-
-			chunkPool.UpdateObjects();
-
-			for (int i = 0; i < FullViewLength; i++)
+			using (Watch watch = new Watch())
 			{
-				Vector3 chunkPosition = i.ResolveIndex(FullViewDistance, FullViewDistance, FullViewDistance) - ViewModifier + LoadReference;
-				Primitives.Chunk chunk;
-				map.TryGetValue(chunkPosition, out chunk);
+				chunkPool.UpdateObjects();
 
-				if (!chunkPool.ContainsKey(chunkPosition))
+				for (int i = 0; i < FullViewLength; i++)
 				{
-					Voxel.Chunk voxelChunk = chunkPool.GetObject(chunkPosition);
-					voxelChunk.SetChunk(chunk);
-				}
-			}
+					Vector3 chunkPosition = i.ResolveIndex(FullViewDistance, FullViewDistance, FullViewDistance) - ViewModifier + LoadReference;
+					Primitives.Chunk chunk;
+					map.TryGetValue(chunkPosition, out chunk);
 
-			foreach (var chunk in chunkPool.ActiveObjects)
-			{
-				chunk.Update(time);
+					if (!chunkPool.ContainsKey(chunkPosition))
+					{
+						Voxel.Chunk voxelChunk = chunkPool.GetObject(chunkPosition);
+						voxelChunk.SetChunk(chunk);
+					}
+				}
+
+				IEnumerator<Chunk> chunkEnumerator = chunkPool.ActiveObjects.GetEnumerator();
+				while (watch.Elapsed < TimeSpan.FromSeconds(0.033) && chunkEnumerator.MoveNext())
+				{
+					chunkEnumerator.Current.Update(time);
+				}
 			}
 		}
 	}

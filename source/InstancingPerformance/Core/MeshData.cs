@@ -16,7 +16,7 @@ namespace InstancingPerformance.Core
 
 		private VertexPositionNormalColor[] vertexPositionColor;
 
-		public int TriangleCount { get { return Triangles.Count; } }
+		public int TriangleCount { get { return Triangles.Count / 3; } }
 
 		public int VertexCount { get { return Vertices.Count; } }
 

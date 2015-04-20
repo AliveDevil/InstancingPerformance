@@ -10,6 +10,11 @@ using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using System.Linq;
+using SharpDX.DirectInput;
+using System.Dynamic;
+using System;
+using System.Text;
+using System.Diagnostics;
 
 namespace InstancingPerformance.Screens
 {
@@ -18,9 +23,7 @@ namespace InstancingPerformance.Screens
 		private Shader basicShader;
 		private PathCamera camera;
 		private World world;
-		private Heightmap heightmap;
-		private HeightmapChunkEnumerator chunkGenerator;
-		private IEnumerator<BlockInsert[]> enumerator;
+		private double lastFrameTime;
 
 		public Scene(App app)
 			: base(app)
@@ -31,68 +34,66 @@ namespace InstancingPerformance.Screens
 			camera.Rotation.Yaw = 0;
 			camera.Rotation.Pitch = 0;
 
-			//camera.AddWayPoint(new WayPoint(0, 0, 32, 0, 0, 0, 0));
-			camera.AddWayPoint(new WayPoint(0, -232, 32, -232, 0.7853f, 0, 0));
-			camera.AddWayPoint(new WayPoint(30, 232, 32, -232, -0.7853f, 0, 0));
-			camera.AddWayPoint(new WayPoint(60, 232, 20, 232, -2.356f, 0, 0));
-			camera.AddWayPoint(new WayPoint(90, -232, 20, 232, -3.926f, 0.7853f, 0));
-			camera.AddWayPoint(new WayPoint(120, -232, 32, -232, -5.497f, 0, 0));
+			const int m = 20;
+			camera.AddWayPoint(new WayPoint(0 * m, -232, 32, -232, 0.7853f, 1.571f, 0));
+			camera.AddWayPoint(new WayPoint(1 * m, 180, 64, 180, 0.7853f, 0.5f, 0));
+			camera.AddWayPoint(new WayPoint(2 * m, -240, 40, 240, 2.356f, 0.78f, 0));
+			camera.AddWayPoint(new WayPoint(3 * m, 0, 40, 0, 2.356f, 0.25f, 0));
+			camera.AddWayPoint(new WayPoint(4 * m, 230, 50, 180, 0, -0.1f, 0));
+			camera.AddWayPoint(new WayPoint(5 * m, -232, 32, -232, 7.068f, 1.571f, 0));
 
-			Services.AddService((Camera)camera);
-			world = new World(App, 16, 10);
+			world = new World(App, 16, 8);
 
 			basicShader = ResourceManager.Shader("Basic.fx",
 				new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0),
 				new InputElement("NORMAL", 0, Format.R32G32B32_Float, 0),
 				new InputElement("COLOR", 0, Format.R8G8B8A8_UNorm, 0));
 
-			heightmap = new Heightmap(App, 32, "ip_heightmap.png");
-			chunkGenerator = new HeightmapChunkEnumerator(heightmap, world.ChunkSize, 8);
-			enumerator = chunkGenerator.GetEnumerator();
-
-			while (enumerator.MoveNext())
+			using (Heightmap heightmap = new Heightmap(App, 64, "ip_heightmap.png"))
+			using (ColorMap colormap = new ColorMap(App, "ip_color.png"))
 			{
-				world.SetBlocks(enumerator.Current.AsParallel().Select(insert =>
-				{
-					insert.Position -= new Vector3(heightmap.Width, 0, heightmap.Height) / 2;
-					return insert;
-				}));
-			}
-		}
+				MapGenerator chunkGenerator = new MapGenerator(heightmap, colormap, world.ChunkSize, 8);
+				IEnumerator<BlockInsert[]> enumerator = chunkGenerator.GetEnumerator();
 
-		public override void Update(double time)
-		{
-			//TryEnumerate();
-			camera.Update(time);
-			world.LoadReference = camera.Position.FloorDiv(world.ChunkSize);
-			world.Update(time);
-		}
-
-		private void TryEnumerate()
-		{
-			if (heightmap != null && chunkGenerator != null && enumerator != null)
-			{
-				if (enumerator.MoveNext())
+				while (enumerator.MoveNext())
 				{
-					world.SetBlocks(enumerator.Current.AsParallel().Select(insert =>
+					world.SetBlocks(enumerator.Current.Select(insert =>
 					{
 						insert.Position -= new Vector3(heightmap.Width, 0, heightmap.Height) / 2;
 						return insert;
 					}));
 				}
-				else
+			}
+		}
+
+		public override void Update(double time)
+		{
+			camera.Update(time);
+			world.LoadReference = camera.Position.FloorDiv(world.ChunkSize);
+			world.Update(time);
+
+			if (KeyState.IsPressed(Key.D))
+			{
+				var dump = new
 				{
-					enumerator.Dispose();
-					enumerator = null;
-					chunkGenerator = null;
-					heightmap.Dispose();
-					heightmap = null;
-				}
+					FrameTime = lastFrameTime,
+					MapChunkCount = world.MapChunkCount,
+					DrawChunkCount = world.DrawChunkCount,
+					TriangleCount = world.TriangleCount
+				};
+				StringBuilder builder = new StringBuilder();
+				builder.AppendLine(string.Format("Dump at {0}", DateTime.Now));
+				builder.AppendLine(string.Format("{0}: {1}", "FrameTime", dump.FrameTime));
+				builder.AppendLine(string.Format("{0}: {1}", "MapChunkCount", dump.MapChunkCount));
+				builder.AppendLine(string.Format("{0}: {1}", "DrawChunkCount", dump.DrawChunkCount));
+				builder.AppendLine(string.Format("{0}: {1}", "TriangleCount", dump.TriangleCount));
+				Trace.TraceInformation(builder.ToString());
 			}
 		}
 
 		public override void Draw(double time)
 		{
+			lastFrameTime = time;
 			App.UseShader(basicShader);
 			basicShader.GetMatrix("View").SetMatrix(camera.View);
 			basicShader.GetMatrix("Projection").SetMatrix(camera.Projection);

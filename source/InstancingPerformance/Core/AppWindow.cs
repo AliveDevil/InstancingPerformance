@@ -4,6 +4,7 @@ using System.Drawing;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
+using SharpDX.DirectInput;
 using SharpDX.DXGI;
 using SharpDX.Windows;
 using Device = SharpDX.Direct3D11.Device;
@@ -23,11 +24,15 @@ namespace InstancingPerformance.Core
 		private Device graphicsDevice;
 		private RasterizerState rasterizerState;
 		private RenderTargetView renderView;
-		private ServiceRegistry serviceRegistry;
 		private SwapChain swapChain;
 		private SwapChainDescription swapChainDescription;
 		private Stopwatch watch;
 		private RenderForm window;
+		private Keyboard keyboard;
+		private Mouse mouse;
+		private DirectInput input;
+		private KeyboardState keyState;
+		private SharpDX.DirectInput.MouseState mouseState;
 
 		public float AspectRatio { get { return ScreenSize.X / ScreenSize.Y; } }
 
@@ -41,9 +46,12 @@ namespace InstancingPerformance.Core
 
 		public Vector2 ScreenSize { get { return new Vector2(1280, 720); } }
 
-		public ServiceRegistry Services { get { return serviceRegistry; } }
-
 		public SwapChain SwapChain { get { return swapChain; } }
+
+		public Keyboard Keyboard { get { return keyboard; } }
+		public KeyboardState KeyState { get { return keyState; } }
+		public Mouse Mouse { get { return mouse; } }
+		public MouseState MouseState { get { return mouseState; } }
 
 		public AppWindow(string title)
 		{
@@ -72,11 +80,19 @@ namespace InstancingPerformance.Core
 
 			BuildBuffer();
 
-			serviceRegistry = new ServiceRegistry();
+			input = new DirectInput();
+			keyboard = new Keyboard(input);
+			keyboard.Acquire();
+			mouse = new Mouse(input);
+			mouse.Acquire();
+			keyState = new KeyboardState();
+			mouseState = new MouseState();
 		}
 
 		public void Dispose()
 		{
+			keyboard.Unacquire();
+			mouse.Unacquire();
 			graphicsContext.Dispose();
 			graphicsDevice.Dispose();
 			swapChain.Dispose();
@@ -171,6 +187,8 @@ namespace InstancingPerformance.Core
 
 			while (accumulator >= dt)
 			{
+				keyboard.GetCurrentState(ref keyState);
+				mouse.GetCurrentState(ref mouseState);
 				Update(dt.TotalSeconds);
 				LateUpdate();
 				accumulator -= dt;

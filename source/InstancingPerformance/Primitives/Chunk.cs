@@ -11,7 +11,7 @@ namespace InstancingPerformance.Primitives
 		{
 			get { return blocks[index]; }
 		}
-
+		public bool Updated { get; set; }
 		public bool Altered { get; set; }
 
 		public int ChunkSize { get; private set; }
@@ -38,6 +38,7 @@ namespace InstancingPerformance.Primitives
 			if (Altered)
 			{
 				Altered = false;
+				Updated = true;
 				MeshData.Clear();
 				for (int i = 0; i < Length; i++)
 				{

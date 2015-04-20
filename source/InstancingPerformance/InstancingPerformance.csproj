@@ -45,6 +45,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="SharpDX, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SharpDXPackageBinDir)\SharpDX.dll</HintPath>
@@ -66,6 +67,9 @@
     <Reference Include="SharpDX.Direct3D11.Effects">
       <HintPath>$(SharpDXPackageBinDir)\SharpDX.Direct3D11.Effects.dll</HintPath>
     </Reference>
+    <Reference Include="SharpDX.DirectInput">
+      <HintPath>$(SharpDXPackageBinDir)\SharpDX.DirectInput.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX.DXGI, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>$(SharpDXPackageBinDir)\SharpDX.DXGI.dll</HintPath>
@@ -77,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Content\test_heightmap.png" />
+    <EmbeddedResource Include="Content\ip_color.png" />
     <Content Include="D3DCompiler_43.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -101,16 +106,16 @@
     <Compile Include="Core\AppObject.cs" />
     <Compile Include="Core\AppWindow.cs" />
     <Compile Include="Core\Camera.cs" />
+    <Compile Include="Core\ColorMap.cs" />
     <Compile Include="Core\Heightmap.cs" />
     <Compile Include="Core\HeightmapChunkEnumerator.cs" />
     <Compile Include="Core\IPooled.cs" />
-    <Compile Include="Core\IServiceRegistry.cs" />
     <Compile Include="Core\ObjectPool`1.cs" />
     <Compile Include="Core\OrbitCamera.cs" />
     <Compile Include="Core\PathCamera.cs" />
     <Compile Include="Core\Rotation.cs" />
-    <Compile Include="Core\ServiceRegistry.cs" />
     <Compile Include="Core\SpriteBatch.cs" />
+    <Compile Include="Core\Watch.cs" />
     <Compile Include="Core\WayPoint.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="Core\IDraw.cs" />

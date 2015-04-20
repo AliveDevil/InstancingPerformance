@@ -19,6 +19,8 @@ namespace InstancingPerformance.Voxel
 
 		public Primitives.Chunk ActiveChunk { get; private set; }
 
+		public int TriangleCount { get { return ActiveChunk != null ? ActiveChunk.MeshData.TriangleCount : 0; } }
+
 		public bool IsActive
 		{
 			get { return Helper.Distance(Position, world.LoadReference) <= world.ViewDistance; }
@@ -63,6 +65,7 @@ namespace InstancingPerformance.Voxel
 
 		public void Reset()
 		{
+			ActiveChunk = null;
 			ResetBuffer();
 		}
 
@@ -81,19 +84,22 @@ namespace InstancingPerformance.Voxel
 
 		public void Update(double time)
 		{
-			if ((updateRequired || (ActiveChunk != null && ActiveChunk.Altered)))
+			if (updateRequired || (ActiveChunk != null && ActiveChunk.Updated))
 			{
 				updateRequired = false;
-				UpdateChunk();
-				RenderMesh();
+				ResetBuffer();
+				if (ActiveChunk != null)
+				{
+					ActiveChunk.Updated = false;
+					UpdateChunk();
+					RenderMesh();
+				}
 			}
 		}
 
 		private void RenderMesh()
 		{
-			ResetBuffer();
-
-			if (ActiveChunk != null && ActiveChunk.MeshData.VertexCount > 0)
+			if (ActiveChunk.MeshData.VertexCount > 0)
 			{
 				ActiveChunk.MeshData.BasicBuffer(Device, out vertexStride, out vertexBuffer, out indexBuffer);
 				vertexBinding = new VertexBufferBinding(vertexBuffer, vertexStride, 0);
@@ -109,8 +115,7 @@ namespace InstancingPerformance.Voxel
 
 		private void UpdateChunk()
 		{
-			if (ActiveChunk != null)
-				ActiveChunk.BuildMesh();
+			ActiveChunk.BuildMesh();
 		}
 	}
 }

@@ -9,18 +9,20 @@ using SharpDX;
 
 namespace InstancingPerformance.Core
 {
-	public class HeightmapChunkEnumerator : IEnumerable<BlockInsert[]>
+	public class MapGenerator : IEnumerable<BlockInsert[]>
 	{
 		private Heightmap heightmap;
+		private ColorMap colormap;
 		private int chunkSize;
 		private int chunkWidthCount;
 		private int chunkDepthCount;
 		private int chunkCount;
 		private int batchYield;
 
-		public HeightmapChunkEnumerator(Heightmap heightmap, int chunkSize, int batchYield)
+		public MapGenerator(Heightmap heightmap, ColorMap colormap, int chunkSize, int batchYield)
 		{
 			this.heightmap = heightmap;
+			this.colormap = colormap;
 			this.chunkSize = chunkSize;
 			this.chunkWidthCount = heightmap.Width / chunkSize;
 			this.chunkDepthCount = heightmap.Height / chunkSize;
@@ -44,7 +46,8 @@ namespace InstancingPerformance.Core
 						int x = cX * chunkSize + iX;
 						int z = cZ * chunkSize + iZ;
 						float h = heightmap[x, z];
-						inserts.Add(new BlockInsert(new Vector3(x, h, z).Floor(), Block.Green));
+						System.Drawing.Color c = colormap[x, z];
+						inserts.Add(new BlockInsert(new Vector3(x, h, z).Floor(), new Block(true, c.R / 255f, c.G / 255f, c.B / 255f)));
 					}
 				}
 
