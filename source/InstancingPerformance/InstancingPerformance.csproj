@@ -107,6 +107,7 @@
     <Compile Include="Core\AppWindow.cs" />
     <Compile Include="Core\Camera.cs" />
     <Compile Include="Core\ColorMap.cs" />
+    <Compile Include="Core\GeometryInfo.cs" />
     <Compile Include="Core\Heightmap.cs" />
     <Compile Include="Core\HeightmapChunkEnumerator.cs" />
     <Compile Include="Core\IPooled.cs" />
@@ -123,6 +124,8 @@
     <Compile Include="Primitives\Block.cs" />
     <Compile Include="Core\MeshData.cs" />
     <Compile Include="Primitives\Chunk.cs" />
+    <Compile Include="Primitives\DrawMode.cs" />
+    <Compile Include="Primitives\Face.cs" />
     <Compile Include="Primitives\Quad.cs" />
     <Compile Include="Primitives\VertexPositionColor.cs" />
     <Compile Include="Program.cs" />

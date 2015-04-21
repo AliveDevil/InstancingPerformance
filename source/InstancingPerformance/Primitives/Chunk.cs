@@ -18,8 +18,6 @@ namespace InstancingPerformance.Primitives
 
 		public int Length { get; private set; }
 
-		public MeshData MeshData { get; private set; }
-
 		public Vector3 Position { get; private set; }
 
 		public Vector3 WorldPosition { get { return Position * ChunkSize; } }
@@ -30,21 +28,14 @@ namespace InstancingPerformance.Primitives
 			ChunkSize = chunksize;
 			blocks = new Block[Length = chunksize * chunksize * chunksize];
 			Altered = true;
-			MeshData = new MeshData();
 		}
 
-		public void BuildMesh()
+		public void BuildMesh(MeshData meshData)
 		{
-			if (Altered)
+			for (int i = 0; i < Length; i++)
 			{
-				Altered = false;
-				Updated = true;
-				MeshData.Clear();
-				for (int i = 0; i < Length; i++)
-				{
-					Vector3 v = i.ResolveIndex(ChunkSize, ChunkSize, ChunkSize);
-					blocks[i].MeshData(this, (int)v.X, (int)v.Y, (int)v.Z, MeshData);
-				}
+				Vector3 v = i.ResolveIndex(ChunkSize, ChunkSize, ChunkSize);
+				blocks[i].MeshData(this, (int)v.X, (int)v.Y, (int)v.Z, meshData);
 			}
 		}
 

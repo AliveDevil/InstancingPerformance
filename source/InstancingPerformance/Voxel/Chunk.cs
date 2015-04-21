@@ -1,4 +1,5 @@
 ﻿using InstancingPerformance.Core;
+using InstancingPerformance.Primitives;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
@@ -8,18 +9,30 @@ namespace InstancingPerformance.Voxel
 {
 	public class Chunk : AppObject, IDraw, IUpdate, IPooled<Vector3>
 	{
+		public static readonly Face Face = new Face(
+			new Vector3(0.5f, -0.5f, 0.5f),
+			new Vector3(0.5f, 0.5f, 0.5f),
+			new Vector3(-0.5f, 0.5f, 0.5f),
+			new Vector3(-0.5f, -0.5f, 0.5f));
+
 		private Buffer indexBuffer;
+		private int indexCount;
+		private VertexBufferBinding instanceBinding;
 		private Buffer instanceBuffer;
+		private int instanceCount;
+		private int instanceStride;
 		private MeshData meshData;
 		private bool updateRequired = true;
 		private VertexBufferBinding vertexBinding;
 		private Buffer vertexBuffer;
+		private int vertexCount;
+		private int vertexPerInstance;
 		private int vertexStride;
 		private World world;
 
 		public Primitives.Chunk ActiveChunk { get; private set; }
 
-		public int TriangleCount { get { return ActiveChunk != null ? ActiveChunk.MeshData.TriangleCount : 0; } }
+		public DrawMode DrawMode { get; set; }
 
 		public bool IsActive
 		{
@@ -34,17 +47,21 @@ namespace InstancingPerformance.Voxel
 
 		public Vector3 Position { get; set; }
 
+		public int TriangleCount { get { return meshData.TriangleCount; } }
+
 		public Vector3 WorldPosition { get { return Position * world.ChunkSize; } }
 
 		public Chunk(World world)
 			: base(world.App)
 		{
 			this.world = world;
+			meshData = new MeshData();
+			meshData.UseFace(Face);
 		}
 
 		public bool CanDraw()
 		{
-			return ActiveChunk != null && vertexBuffer != null;
+			return vertexBuffer != null;
 		}
 
 		public void Draw(double time)
@@ -52,9 +69,21 @@ namespace InstancingPerformance.Voxel
 			if (CanDraw())
 			{
 				Context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-				Context.InputAssembler.SetVertexBuffers(0, vertexBinding);
-				Context.InputAssembler.SetIndexBuffer(indexBuffer, Format.R32_SInt, 0);
-				Context.DrawIndexed(ActiveChunk.MeshData.Triangles.Count, 0, 0);
+				switch (DrawMode)
+				{
+					case DrawMode.Basic:
+						Context.InputAssembler.SetVertexBuffers(0, vertexBinding);
+						Context.InputAssembler.SetIndexBuffer(indexBuffer, Format.R32_SInt, 0);
+						Context.DrawIndexed(indexCount, 0, 0);
+						break;
+
+					case DrawMode.Hardware:
+						Context.DrawIndexedInstanced(6, instanceCount, 0, 0, 0);
+						break;
+
+					case DrawMode.Geometry:
+						break;
+				}
 			}
 		}
 
@@ -75,10 +104,6 @@ namespace InstancingPerformance.Voxel
 			{
 				this.ActiveChunk = chunk;
 				updateRequired = true;
-				if (chunk != null)
-					meshData = this.ActiveChunk.MeshData;
-				else
-					meshData = null;
 			}
 		}
 
@@ -99,15 +124,14 @@ namespace InstancingPerformance.Voxel
 
 		private void RenderMesh()
 		{
-			if (ActiveChunk.MeshData.VertexCount > 0)
-			{
-				ActiveChunk.MeshData.BasicBuffer(Device, out vertexStride, out vertexBuffer, out indexBuffer);
-				vertexBinding = new VertexBufferBinding(vertexBuffer, vertexStride, 0);
-			}
+			meshData.Create(Device, out vertexStride, out vertexCount, out vertexBuffer, out instanceStride, out instanceCount, out vertexPerInstance, out instanceBuffer, out indexCount, out indexBuffer);
+			vertexBinding = new VertexBufferBinding(vertexBuffer, vertexStride, 0);
+			instanceBinding = new VertexBufferBinding(instanceBuffer, instanceStride, 0);
 		}
 
 		private void ResetBuffer()
 		{
+			meshData.Clear();
 			Utilities.Dispose(ref vertexBuffer);
 			Utilities.Dispose(ref instanceBuffer);
 			Utilities.Dispose(ref indexBuffer);
@@ -115,7 +139,7 @@ namespace InstancingPerformance.Voxel
 
 		private void UpdateChunk()
 		{
-			ActiveChunk.BuildMesh();
+			ActiveChunk.BuildMesh(meshData);
 		}
 	}
 }

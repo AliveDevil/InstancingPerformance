@@ -29,20 +29,45 @@ namespace InstancingPerformance.Primitives
 
 		public void MeshData(Primitives.Chunk chunk, int x, int y, int z, MeshData meshData)
 		{
+			int c = 0;
+
 			if (Solid)
 			{
 				if (!chunk.GetBlock(new Vector3(x, y + 1, z)).Solid)
+				{
 					FaceDataUp(x, y, z, meshData);
+					c |= 0x01;
+				}
 				if (!chunk.GetBlock(new Vector3(x, y - 1, z)).Solid)
+				{
 					FaceDataDown(x, y, z, meshData);
+					c |= 0x02;
+				}
 				if (!chunk.GetBlock(new Vector3(x, y, z + 1)).Solid)
+				{
 					FaceDataNorth(x, y, z, meshData);
+					c |= 0x04;
+				}
 				if (!chunk.GetBlock(new Vector3(x, y, z - 1)).Solid)
+				{
 					FaceDataSouth(x, y, z, meshData);
+					c |= 0x08;
+				}
 				if (!chunk.GetBlock(new Vector3(x + 1, y, z)).Solid)
+				{
 					FaceDataEast(x, y, z, meshData);
+					c |= 0x10;
+				}
 				if (!chunk.GetBlock(new Vector3(x - 1, y, z)).Solid)
+				{
 					FaceDataWest(x, y, z, meshData);
+					c |= 0x20;
+				}
+			}
+
+			if (c > 0 && c < 0x3F)
+			{
+				meshData.AddGeometryInfo(new Vector3(x, y, z), Color, c);
 			}
 		}
 
@@ -53,74 +78,32 @@ namespace InstancingPerformance.Primitives
 
 		private void FaceDataDown(int x, int y, int z, MeshData meshData)
 		{
-			meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f));
-			meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f));
-			meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f));
-			meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f));
-
-			meshData.AddQuadTriangles();
-			meshData.AddNormal(Vector3.Down);
-			meshData.AddColor(Color);
+			meshData.AddFace(new Vector3(x, y, z), new Rotation(0, -MathUtil.PiOverTwo, 0), Color, Vector3.Down);
 		}
 
 		private void FaceDataEast(int x, int y, int z, MeshData meshData)
 		{
-			meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f));
-			meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f));
-			meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f));
-			meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f));
-
-			meshData.AddQuadTriangles();
-			meshData.AddNormal(Vector3.Right);
-			meshData.AddColor(Color);
+			meshData.AddFace(new Vector3(x, y, z), new Rotation(MathUtil.PiOverTwo, 0, 0), Color, Vector3.Right);
 		}
 
 		private void FaceDataNorth(int x, int y, int z, MeshData meshData)
 		{
-			meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z + 0.5f));
-			meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f));
-			meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f));
-			meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f));
-
-			meshData.AddQuadTriangles();
-			meshData.AddNormal(Vector3.ForwardLH);
-			meshData.AddColor(Color);
+			meshData.AddFace(new Vector3(x, y, z), new Rotation(0, 0, 0), Color, Vector3.ForwardLH);
 		}
 
 		private void FaceDataSouth(int x, int y, int z, MeshData meshData)
 		{
-			meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f));
-			meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f));
-			meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f));
-			meshData.AddVertex(new Vector3(x + 0.5f, y - 0.5f, z - 0.5f));
-
-			meshData.AddQuadTriangles();
-			meshData.AddNormal(Vector3.BackwardLH);
-			meshData.AddColor(Color);
+			meshData.AddFace(new Vector3(x, y, z), new Rotation(MathUtil.Pi, 0, 0), Color, Vector3.BackwardLH);
 		}
 
 		private void FaceDataUp(int x, int y, int z, MeshData meshData)
 		{
-			meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f));
-			meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f));
-			meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z + 0.5f));
-			meshData.AddVertex(new Vector3(x + 0.5f, y + 0.5f, z - 0.5f));
-
-			meshData.AddQuadTriangles();
-			meshData.AddNormal(Vector3.Up);
-			meshData.AddColor(Color);
+			meshData.AddFace(new Vector3(x, y, z), new Rotation(0, MathUtil.PiOverTwo, 0), Color, Vector3.Up);
 		}
 
 		private void FaceDataWest(int x, int y, int z, MeshData meshData)
 		{
-			meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z + 0.5f));
-			meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z + 0.5f));
-			meshData.AddVertex(new Vector3(x - 0.5f, y + 0.5f, z - 0.5f));
-			meshData.AddVertex(new Vector3(x - 0.5f, y - 0.5f, z - 0.5f));
-
-			meshData.AddQuadTriangles();
-			meshData.AddNormal(Vector3.Left);
-			meshData.AddColor(Color);
+			meshData.AddFace(new Vector3(x, y, z), new Rotation(-MathUtil.PiOverTwo, 0, 0), Color, Vector3.Left);
 		}
 	}
 }

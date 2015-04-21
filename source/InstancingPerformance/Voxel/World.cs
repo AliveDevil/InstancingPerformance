@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using InstancingPerformance.Core;
 using InstancingPerformance.Primitives;
 using SharpDX;
-using System.Linq;
 
 namespace InstancingPerformance.Voxel
 {
@@ -15,17 +15,17 @@ namespace InstancingPerformance.Voxel
 
 		public int ChunkSize { get; private set; }
 
+		public int DrawChunkCount { get { return chunkPool.ActiveObjects.Count(chunk => chunk.CanDraw()); } }
+
 		public Vector3 LoadReference { get; set; }
 
 		public int MapChunkCount { get { return map.Count; } }
 
+		public int TriangleCount { get { return chunkPool.ActiveObjects.Select(c => c.TriangleCount).Sum(); } }
+
 		public int ViewDistance { get; private set; }
 
 		public Vector3 ViewModifier { get { return new Vector3(ViewDistance, ViewDistance, ViewDistance); } }
-
-		public int DrawChunkCount { get { return chunkPool.ActiveObjects.Count(chunk => chunk.CanDraw()); } }
-
-		public int TriangleCount { get { return chunkPool.ActiveObjects.Select(c => c.TriangleCount).Sum(); } }
 
 		private int FullViewDistance { get { return ViewDistance * 2 + 1; } }
 
@@ -108,6 +108,14 @@ namespace InstancingPerformance.Voxel
 					chunkEnumerator.Current.Update(time);
 				}
 			}
+		}
+
+		public void UseBasicMode()
+		{
+		}
+
+		public void UseHardwareMode()
+		{
 		}
 	}
 }
