@@ -73,7 +73,7 @@ namespace InstancingPerformance.Core
 				Rotation rotation = Rotations[i];
 				Vector3 normal = Normals[i];
 				Color color = Colors[i];
-				Face face = (Face * rotation.Quaternion) + basePosition;
+				Face face = Face * rotation + basePosition;
 				vertices.Add(new VertexPositionNormalColor(face.BottomLeft, normal, color));
 				vertices.Add(new VertexPositionNormalColor(face.TopLeft, normal, color));
 				vertices.Add(new VertexPositionNormalColor(face.TopRight, normal, color));

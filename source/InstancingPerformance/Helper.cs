@@ -20,6 +20,11 @@ namespace InstancingPerformance
 			return Floor((v.Y * x) + v.X);
 		}
 
+		public static Vector3 ToVector3(this Vector4 v)
+		{
+			return new Vector3(v.X, v.Y, v.Z);
+		}
+
 		public static int IndiceVector(this Vector3 v, int x, int y, int z)
 		{
 			return (int)(((v.Z * y) + v.Y) * x + v.X);

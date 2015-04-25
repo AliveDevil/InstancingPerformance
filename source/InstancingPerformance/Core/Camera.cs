@@ -16,7 +16,7 @@ namespace InstancingPerformance.Core
 
 		public virtual Matrix View
 		{
-			get { return Matrix.LookAtLH(Position, Position + Vector3.Transform(Vector3.ForwardLH, Rotation.Quaternion), Vector3.Up); }
+			get { return Matrix.LookAtLH(Position, Position + Vector3.ForwardLH * Rotation, Vector3.Up); }
 		}
 
 		public Camera(App app)

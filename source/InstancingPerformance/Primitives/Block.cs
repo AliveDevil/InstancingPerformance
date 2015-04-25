@@ -78,12 +78,12 @@ namespace InstancingPerformance.Primitives
 
 		private void FaceDataDown(int x, int y, int z, MeshData meshData)
 		{
-			meshData.AddFace(new Vector3(x, y, z), new Rotation(0, -MathUtil.PiOverTwo, 0), Color, Vector3.Down);
+			meshData.AddFace(new Vector3(x, y, z), new Rotation(0, -90, 0), Color, Vector3.Down);
 		}
 
 		private void FaceDataEast(int x, int y, int z, MeshData meshData)
 		{
-			meshData.AddFace(new Vector3(x, y, z), new Rotation(MathUtil.PiOverTwo, 0, 0), Color, Vector3.Right);
+			meshData.AddFace(new Vector3(x, y, z), new Rotation(90, 0, 0), Color, Vector3.Right);
 		}
 
 		private void FaceDataNorth(int x, int y, int z, MeshData meshData)
@@ -93,17 +93,17 @@ namespace InstancingPerformance.Primitives
 
 		private void FaceDataSouth(int x, int y, int z, MeshData meshData)
 		{
-			meshData.AddFace(new Vector3(x, y, z), new Rotation(MathUtil.Pi, 0, 0), Color, Vector3.BackwardLH);
+			meshData.AddFace(new Vector3(x, y, z), new Rotation(180, 0, 0), Color, Vector3.BackwardLH);
 		}
 
 		private void FaceDataUp(int x, int y, int z, MeshData meshData)
 		{
-			meshData.AddFace(new Vector3(x, y, z), new Rotation(0, MathUtil.PiOverTwo, 0), Color, Vector3.Up);
+			meshData.AddFace(new Vector3(x, y, z), new Rotation(0, 90, 0), Color, Vector3.Up);
 		}
 
 		private void FaceDataWest(int x, int y, int z, MeshData meshData)
 		{
-			meshData.AddFace(new Vector3(x, y, z), new Rotation(-MathUtil.PiOverTwo, 0, 0), Color, Vector3.Left);
+			meshData.AddFace(new Vector3(x, y, z), new Rotation(-90, 0, 0), Color, Vector3.Left);
 		}
 	}
 }

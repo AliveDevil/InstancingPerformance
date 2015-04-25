@@ -97,8 +97,8 @@ namespace InstancingPerformance.Screens
 			App.UseShader(basicShader);
 			basicShader.GetMatrix("View").SetMatrix(camera.View);
 			basicShader.GetMatrix("Projection").SetMatrix(camera.Projection);
-			basicShader.GetVector("LightColor").Set(Color.Black);
-			basicShader.GetVector("LightDirection").Set(Vector3.Normalize(new Vector3(0.5f, -1, 2f)));
+			basicShader.GetVector("LightColor").Set(Color.White);
+			basicShader.GetVector("LightDirection").Set(Vector3.Normalize(new Vector3(0, -1, 2f)));
 			world.Draw(time);
 		}
 	}

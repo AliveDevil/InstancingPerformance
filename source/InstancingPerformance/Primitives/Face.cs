@@ -27,13 +27,13 @@ namespace InstancingPerformance.Primitives
 				v + face.BottomRight);
 		}
 
-		public static Face operator *(Face face, Quaternion quaternion)
+		public static Face operator *(Face face, Rotation rotation)
 		{
 			return new Face(
-				Vector3.Transform(face.BottomLeft, quaternion),
-				Vector3.Transform(face.TopLeft, quaternion),
-				Vector3.Transform(face.TopRight, quaternion),
-				Vector3.Transform(face.BottomRight, quaternion));
+				face.BottomLeft * rotation,
+				face.TopLeft * rotation,
+				face.TopRight * rotation,
+				face.BottomRight * rotation);
 		}
 	}
 }
