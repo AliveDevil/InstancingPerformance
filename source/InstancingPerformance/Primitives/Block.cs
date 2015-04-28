@@ -78,7 +78,7 @@ namespace InstancingPerformance.Primitives
 
 		private void FaceDataDown(int x, int y, int z, MeshData meshData)
 		{
-			meshData.AddFace(new Vector3(x, y, z), new Rotation(0, -90, 0), Color, Vector3.Down);
+			meshData.AddFace(new Vector3(x, y, z), new Rotation(0, 90, 0), Color, Vector3.Down);
 		}
 
 		private void FaceDataEast(int x, int y, int z, MeshData meshData)
@@ -98,7 +98,7 @@ namespace InstancingPerformance.Primitives
 
 		private void FaceDataUp(int x, int y, int z, MeshData meshData)
 		{
-			meshData.AddFace(new Vector3(x, y, z), new Rotation(0, 90, 0), Color, Vector3.Up);
+			meshData.AddFace(new Vector3(x, y, z), new Rotation(0, -90, 0), Color, Vector3.Up);
 		}
 
 		private void FaceDataWest(int x, int y, int z, MeshData meshData)

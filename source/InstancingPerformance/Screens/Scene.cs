@@ -1,20 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
 using InstancingPerformance.Content;
 using InstancingPerformance.Core;
-using InstancingPerformance.Primitives;
 using InstancingPerformance.Voxel;
 using SharpDX;
-using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
-using SharpDX.DXGI;
-using System.Linq;
 using SharpDX.DirectInput;
-using System.Dynamic;
-using System;
-using System.Text;
-using System.Diagnostics;
+using SharpDX.DXGI;
 
 namespace InstancingPerformance.Screens
 {
@@ -22,8 +17,8 @@ namespace InstancingPerformance.Screens
 	{
 		private Shader basicShader;
 		private PathCamera camera;
-		private World world;
 		private double lastFrameTime;
+		private World world;
 
 		public Scene(App app)
 			: base(app)
@@ -35,12 +30,12 @@ namespace InstancingPerformance.Screens
 			camera.Rotation.Pitch = 0;
 
 			const int m = 20;
-			camera.AddWayPoint(new WayPoint(0 * m, -232, 32, -232, 0.7853f, 1.571f, 0));
-			camera.AddWayPoint(new WayPoint(1 * m, 180, 64, 180, 0.7853f, 0.5f, 0));
-			camera.AddWayPoint(new WayPoint(2 * m, -240, 40, 240, 2.356f, 0.78f, 0));
-			camera.AddWayPoint(new WayPoint(3 * m, 0, 40, 0, 2.356f, 0.25f, 0));
+			camera.AddWayPoint(new WayPoint(0 * m, -232, 32, -232, 45, 60, 0));
+			camera.AddWayPoint(new WayPoint(1 * m, 180, 64, 180, 45, 25, 0));
+			camera.AddWayPoint(new WayPoint(2 * m, -240, 40, 240, 135, 45, 0));
+			camera.AddWayPoint(new WayPoint(3 * m, 0, 40, 0, 135, 30, 0));
 			camera.AddWayPoint(new WayPoint(4 * m, 230, 50, 180, 0, -0.1f, 0));
-			camera.AddWayPoint(new WayPoint(5 * m, -232, 32, -232, 7.068f, 1.571f, 0));
+			camera.AddWayPoint(new WayPoint(5 * m, -232, 32, -232, 440, 1.571f, 0));
 
 			world = new World(App, 16, 8);
 
@@ -66,6 +61,17 @@ namespace InstancingPerformance.Screens
 			}
 		}
 
+		public override void Draw(double time)
+		{
+			lastFrameTime = time;
+			App.UseShader(basicShader);
+			basicShader.GetMatrix("View").SetMatrix(camera.View);
+			basicShader.GetMatrix("Projection").SetMatrix(camera.Projection);
+			basicShader.GetVector("LightColor").Set(Color.White);
+			basicShader.GetVector("LightDirection").Set(Vector3.Normalize(new Vector3(1, -1, 1)));
+			world.Draw(time);
+		}
+
 		public override void Update(double time)
 		{
 			camera.Update(time);
@@ -89,17 +95,6 @@ namespace InstancingPerformance.Screens
 				builder.AppendLine(string.Format("{0}: {1}", "TriangleCount", dump.TriangleCount));
 				Trace.TraceInformation(builder.ToString());
 			}
-		}
-
-		public override void Draw(double time)
-		{
-			lastFrameTime = time;
-			App.UseShader(basicShader);
-			basicShader.GetMatrix("View").SetMatrix(camera.View);
-			basicShader.GetMatrix("Projection").SetMatrix(camera.Projection);
-			basicShader.GetVector("LightColor").Set(Color.White);
-			basicShader.GetVector("LightDirection").Set(Vector3.Normalize(new Vector3(0, -1, 2f)));
-			world.Draw(time);
 		}
 	}
 }

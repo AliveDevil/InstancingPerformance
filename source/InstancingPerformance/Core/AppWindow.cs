@@ -22,17 +22,17 @@ namespace InstancingPerformance.Core
 		private Factory factory;
 		private DeviceContext graphicsContext;
 		private Device graphicsDevice;
+		private DirectInput input;
+		private Keyboard keyboard;
+		private KeyboardState keyState;
+		private Mouse mouse;
+		private SharpDX.DirectInput.MouseState mouseState;
 		private RasterizerState rasterizerState;
 		private RenderTargetView renderView;
 		private SwapChain swapChain;
 		private SwapChainDescription swapChainDescription;
 		private Stopwatch watch;
 		private RenderForm window;
-		private Keyboard keyboard;
-		private Mouse mouse;
-		private DirectInput input;
-		private KeyboardState keyState;
-		private SharpDX.DirectInput.MouseState mouseState;
 
 		public float AspectRatio { get { return ScreenSize.X / ScreenSize.Y; } }
 
@@ -42,16 +42,19 @@ namespace InstancingPerformance.Core
 
 		public DepthStencilView Depthbuffer { get { return depthView; } }
 
+		public Keyboard Keyboard { get { return keyboard; } }
+
+		public KeyboardState KeyState { get { return keyState; } }
+
+		public Mouse Mouse { get { return mouse; } }
+
+		public MouseState MouseState { get { return mouseState; } }
+
 		public bool RunningSlow { get; private set; }
 
 		public Vector2 ScreenSize { get { return new Vector2(1280, 720); } }
 
 		public SwapChain SwapChain { get { return swapChain; } }
-
-		public Keyboard Keyboard { get { return keyboard; } }
-		public KeyboardState KeyState { get { return keyState; } }
-		public Mouse Mouse { get { return mouse; } }
-		public MouseState MouseState { get { return mouseState; } }
 
 		public AppWindow(string title)
 		{
