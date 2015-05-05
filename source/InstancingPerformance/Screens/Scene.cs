@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using InstancingPerformance.Content;
 using InstancingPerformance.Core;
+using InstancingPerformance.Primitives;
 using InstancingPerformance.Voxel;
 using SharpDX;
 using SharpDX.Direct3D11;
@@ -19,6 +20,7 @@ namespace InstancingPerformance.Screens
 		private PathCamera camera;
 		private double lastFrameTime;
 		private World world;
+		private DrawMode drawMode;
 
 		public Scene(App app)
 			: base(app)
@@ -39,10 +41,18 @@ namespace InstancingPerformance.Screens
 
 			world = new World(App, 16, 8);
 
-			basicShader = ResourceManager.Shader("Basic.fx",
-				new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0),
-				new InputElement("NORMAL", 0, Format.R32G32B32_Float, 0),
-				new InputElement("COLOR", 0, Format.R8G8B8A8_UNorm, 0));
+			basicShader = ResourceManager.Shader("Complete.fx",
+				new Dictionary<string, InputElement[]>()
+				{
+					{
+						"Basic", new InputElement[]
+						{
+							new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0),
+							new InputElement("NORMAL", 0, Format.R32G32B32_Float, 0),
+							new InputElement("COLOR", 0, Format.R8G8B8A8_UNorm, 0),
+						}
+					}
+				});
 
 			using (Heightmap heightmap = new Heightmap(App, 64, "ip_heightmap.png"))
 			using (ColorMap colormap = new ColorMap(App, "ip_color.png"))
@@ -65,10 +75,10 @@ namespace InstancingPerformance.Screens
 		{
 			lastFrameTime = time;
 			App.UseShader(basicShader);
-			basicShader.GetMatrix("View").SetMatrix(camera.View);
-			basicShader.GetMatrix("Projection").SetMatrix(camera.Projection);
-			basicShader.GetVector("LightColor").Set(Color.White);
-			basicShader.GetVector("LightDirection").Set(Vector3.Normalize(new Vector3(1, -1, 1)));
+			basicShader.Matrix("View").SetMatrix(camera.View);
+			basicShader.Matrix("Projection").SetMatrix(camera.Projection);
+			basicShader.Vector("LightColor").Set(Color.White);
+			basicShader.Vector("LightDirection").Set(Vector3.Normalize(new Vector3(0.25f, -1, 2)));
 			world.Draw(time);
 		}
 

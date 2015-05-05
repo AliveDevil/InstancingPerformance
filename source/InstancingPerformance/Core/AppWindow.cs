@@ -23,10 +23,6 @@ namespace InstancingPerformance.Core
 		private DeviceContext graphicsContext;
 		private Device graphicsDevice;
 		private DirectInput input;
-		private Keyboard keyboard;
-		private KeyboardState keyState;
-		private Mouse mouse;
-		private SharpDX.DirectInput.MouseState mouseState;
 		private RasterizerState rasterizerState;
 		private RenderTargetView renderView;
 		private SwapChain swapChain;
@@ -34,27 +30,18 @@ namespace InstancingPerformance.Core
 		private Stopwatch watch;
 		private RenderForm window;
 
-		public float AspectRatio { get { return ScreenSize.X / ScreenSize.Y; } }
+		public float AspectRatio => ScreenSize.X / ScreenSize.Y;
+		public RenderTargetView Backbuffer => renderView;
+		public DeviceContext Context => graphicsContext;
+		public DepthStencilView Depthbuffer => depthView;
+		public Vector2 ScreenSize => new Vector2(1280, 720);
+		public SwapChain SwapChain => swapChain;
 
-		public RenderTargetView Backbuffer { get { return renderView; } }
-
-		public DeviceContext Context { get { return graphicsContext; } }
-
-		public DepthStencilView Depthbuffer { get { return depthView; } }
-
-		public Keyboard Keyboard { get { return keyboard; } }
-
-		public KeyboardState KeyState { get { return keyState; } }
-
-		public Mouse Mouse { get { return mouse; } }
-
-		public MouseState MouseState { get { return mouseState; } }
-
+		public Keyboard Keyboard { get; }
+		public Mouse Mouse { get; }
+		public KeyboardState KeyState { get; private set; }
+		public MouseState MouseState { get; private set; }
 		public bool RunningSlow { get; private set; }
-
-		public Vector2 ScreenSize { get { return new Vector2(1280, 720); } }
-
-		public SwapChain SwapChain { get { return swapChain; } }
 
 		public AppWindow(string title)
 		{
@@ -84,18 +71,18 @@ namespace InstancingPerformance.Core
 			BuildBuffer();
 
 			input = new DirectInput();
-			keyboard = new Keyboard(input);
-			keyboard.Acquire();
-			mouse = new Mouse(input);
-			mouse.Acquire();
-			keyState = new KeyboardState();
-			mouseState = new MouseState();
+			Keyboard = new Keyboard(input);
+			Keyboard.Acquire();
+			Mouse = new Mouse(input);
+			Mouse.Acquire();
+			KeyState = new KeyboardState();
+			MouseState = new MouseState();
 		}
 
 		public void Dispose()
 		{
-			keyboard.Unacquire();
-			mouse.Unacquire();
+			Keyboard.Unacquire();
+			Mouse.Unacquire();
 			graphicsContext.Dispose();
 			graphicsDevice.Dispose();
 			swapChain.Dispose();
@@ -190,8 +177,8 @@ namespace InstancingPerformance.Core
 
 			while (accumulator >= dt)
 			{
-				keyboard.GetCurrentState(ref keyState);
-				mouse.GetCurrentState(ref mouseState);
+				KeyState = Keyboard.GetCurrentState();
+				MouseState = Mouse.GetCurrentState();
 				Update(dt.TotalSeconds);
 				LateUpdate();
 				accumulator -= dt;

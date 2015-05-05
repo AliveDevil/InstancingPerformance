@@ -30,26 +30,18 @@ namespace InstancingPerformance.Voxel
 		private int vertexStride;
 		private World world;
 
-		public Primitives.Chunk ActiveChunk { get; private set; }
-
-		public DrawMode DrawMode { get; set; }
-
-		public bool IsActive
-		{
-			get { return Helper.Distance(Position, world.LoadReference) <= world.ViewDistance; }
-		}
-
 		public Vector3 Key
 		{
 			get { return Position; }
 			set { Position = value; }
 		}
-
+		public Primitives.Chunk ActiveChunk { get; private set; }
+		public DrawMode DrawMode { get; set; }
 		public Vector3 Position { get; set; }
-
-		public int TriangleCount { get { return meshData.TriangleCount; } }
-
-		public Vector3 WorldPosition { get { return Position * world.ChunkSize; } }
+		public bool IsActive => Helper.Distance(Position, world.LoadReference) <= world.ViewDistance;
+		public int TriangleCount => meshData.TriangleCount;
+		public Vector3 WorldPosition => Position * world.ChunkSize;
+		public bool CanDraw => vertexBuffer != null;
 
 		public Chunk(World world)
 			: base(world.App)
@@ -59,14 +51,9 @@ namespace InstancingPerformance.Voxel
 			meshData.UseFace(Face);
 		}
 
-		public bool CanDraw()
-		{
-			return vertexBuffer != null;
-		}
-
 		public void Draw(double time)
 		{
-			if (CanDraw())
+			if (CanDraw)
 			{
 				Context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 				switch (DrawMode)

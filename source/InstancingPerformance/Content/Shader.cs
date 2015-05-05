@@ -1,4 +1,5 @@
-﻿using InstancingPerformance.Core;
+﻿using System.Collections.Generic;
+using InstancingPerformance.Core;
 using SharpDX;
 using SharpDX.Direct3D11;
 
@@ -6,29 +7,29 @@ namespace InstancingPerformance.Content
 {
 	public class Shader : AppObject
 	{
-		public Effect Effect;
-		public InputLayout Layout;
+		public Effect Effect { get; }
+		public IDictionary<string, InputLayout> Layouts { get; } = new Dictionary<string, InputLayout>();
 
-		public Shader(App app, Effect effect, InputLayout layout)
+		public Shader(App app, Effect effect, IDictionary<string, InputLayout> layouts)
 			: base(app)
 		{
 			Effect = effect;
-			Layout = layout;
+			foreach (var item in layouts)
+			{
+				Layouts.Add(item);
+			}
 		}
 
-		public void SetCamera(string name, Matrix world, Matrix view, Matrix projection)
-		{
-			GetMatrix(name).SetMatrix(world * view * projection);
-		}
+		public EffectMatrixVariable Matrix(string name) => Effect.GetVariableByName(name).AsMatrix();
+		public EffectPass Pass(int index) => Effect.GetTechniqueByIndex(0).GetPassByIndex(index);
+		public EffectVectorVariable Vector(string name) => Effect.GetVariableByName(name).AsVector();
+		public void SetCamera(string name, Matrix world, Matrix view, Matrix projection) => Matrix(name).SetMatrix(world * view * projection);
 
-		public EffectMatrixVariable GetMatrix(string name)
+		public InputLayout Layout(string pass)
 		{
-			return Effect.GetVariableByName(name).AsMatrix();
-		}
-
-		internal EffectVectorVariable GetVector(string name)
-		{
-			return Effect.GetVariableByName(name).AsVector();
+			InputLayout layout;
+			Layouts.TryGetValue(pass, out layout);
+			return layout;
 		}
 	}
 }

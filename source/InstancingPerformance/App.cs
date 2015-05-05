@@ -12,39 +12,22 @@ namespace InstancingPerformance
 		private ScreenManager screenManager;
 		private Shader activeShader;
 
-		public Shader ActiveShader
-		{
-			get { return activeShader; }
-		}
+		public Shader ActiveShader => activeShader;
+		public ResourceManager ResourceManager => resourceManager;
+		public ScreenManager ScreenManager => screenManager;
 
-		public ResourceManager ResourceManager
-		{
-			get { return resourceManager; }
-		}
+		public App() : base("InstancingPerformance") { }
 
-		public ScreenManager ScreenManager
-		{
-			get { return screenManager; }
-		}
-
-		public App()
-			: base("InstancingPerformance")
-		{
-		}
-
-		public void ApplyShader()
+		public void ApplyShader(string passName)
 		{
 			if (activeShader != null)
 			{
 				activeShader.Effect.GetTechniqueByIndex(0).GetPassByIndex(0).Apply(Context);
-				Context.InputAssembler.InputLayout = activeShader.Layout;
+				Context.InputAssembler.InputLayout = activeShader.Layout(passName);
 			}
 		}
 
-		public void UseShader(Shader shader)
-		{
-			activeShader = shader;
-		}
+		public void UseShader(Shader shader) => activeShader = shader;
 
 		protected override void Draw(double time)
 		{
@@ -60,9 +43,6 @@ namespace InstancingPerformance
 			screenManager.SetScreen(new Scene(this));
 		}
 
-		protected override void Update(double time)
-		{
-			screenManager.Update(time);
-		}
+		protected override void Update(double time) => screenManager.Update(time);
 	}
 }

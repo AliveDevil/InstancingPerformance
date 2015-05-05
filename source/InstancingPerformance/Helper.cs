@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using SharpDX;
 
 namespace InstancingPerformance
@@ -23,6 +24,14 @@ namespace InstancingPerformance
 		public static Vector3 ToVector3(this Vector4 v)
 		{
 			return new Vector3(v.X, v.Y, v.Z);
+		}
+
+		public static void Loop<T>(this IEnumerable<T> collection, Action<T> action)
+		{
+			foreach (var item in collection)
+			{
+				action(item);
+			}
 		}
 
 		public static int IndiceVector(this Vector3 v, int x, int y, int z)

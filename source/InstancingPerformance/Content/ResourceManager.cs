@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using InstancingPerformance.Core;
 using SharpDX.D3DCompiler;
@@ -8,13 +9,10 @@ namespace InstancingPerformance.Content
 {
 	public class ResourceManager : AppObject
 	{
-		private static Assembly assembly = Assembly.GetExecutingAssembly();
-		private static string basePath = assembly.GetName().Name + ".Content";
+		private static Assembly assembly { get; } = Assembly.GetExecutingAssembly();
+		private static string basePath { get; } = assembly.GetName().Name + ".Content";
 
-		public ResourceManager(App app)
-			: base(app)
-		{
-		}
+		public ResourceManager(App app) : base(app) { }
 
 		public static string ResourceContent(string filename)
 		{
@@ -23,16 +21,20 @@ namespace InstancingPerformance.Content
 				return reader.ReadToEnd();
 		}
 
-		public static Stream ResourceStream(string filename)
-		{
-			return assembly.GetManifestResourceStream(string.Format("{0}.{1}", basePath, filename));
-		}
+		public static Stream ResourceStream(string filename) => assembly.GetManifestResourceStream($"{basePath}.{filename}");
 
-		public Shader Shader(string filename, params InputElement[] input)
+		public Shader Shader(string filename, IDictionary<string, InputElement[]> input)
 		{
 			Effect effect = new Effect(Device, ShaderBytecode.Compile(ResourceContent(filename), "fx_5_0", ShaderFlags.None, EffectFlags.None));
-			InputLayout layout = new InputLayout(Device, effect.GetTechniqueByIndex(0).GetPassByIndex(0).Description.Signature, input);
-			return new Shader(App, effect, layout);
+			IDictionary<string, InputLayout> layouts = new Dictionary<string, InputLayout>();
+			for (int i = 0; i < effect.GetTechniqueByIndex(0).Description.PassCount; i++)
+			{
+				EffectPass pass = effect.GetTechniqueByIndex(0).GetPassByIndex(0);
+				var signature = pass.Description.Signature;
+				string name = pass.Description.Name;
+				layouts.Add(name, new InputLayout(Device, signature, input[name]));
+			}
+			return new Shader(App, effect, layouts);
 		}
 	}
 }

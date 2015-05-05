@@ -83,6 +83,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Content\test_heightmap.png" />
     <EmbeddedResource Include="Content\ip_color.png" />
+    <EmbeddedResource Include="Content\Complete.fx" />
     <Content Include="D3DCompiler_43.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -113,7 +114,6 @@
     <Compile Include="Core\HeightmapChunkEnumerator.cs" />
     <Compile Include="Core\IPooled.cs" />
     <Compile Include="Core\ObjectPool`1.cs" />
-    <Compile Include="Core\OrbitCamera.cs" />
     <Compile Include="Core\PathCamera.cs" />
     <Compile Include="Core\Rotation.cs" />
     <Compile Include="Core\SpriteBatch.cs" />

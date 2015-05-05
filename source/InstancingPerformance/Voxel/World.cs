@@ -9,46 +9,35 @@ namespace InstancingPerformance.Voxel
 {
 	public class World : AppObject, IDraw, IUpdate
 	{
-		private HashSet<Action> bufferedActions;
-		private ObjectPool<Voxel.Chunk, Vector3> chunkPool;
-		private Dictionary<Vector3, Primitives.Chunk> map;
+		private HashSet<Action> bufferedActions => new HashSet<Action>();
+		private ObjectPool<Chunk, Vector3> chunkPool => new ObjectPool<Chunk, Vector3>(() => new Chunk(this));
+		private Dictionary<Vector3, Primitives.Chunk> map => new Dictionary<Vector3, Primitives.Chunk>();
 
-		public int ChunkSize { get; private set; }
-
-		public int DrawChunkCount { get { return chunkPool.ActiveObjects.Count(chunk => chunk.CanDraw()); } }
-
+		public int ViewDistance { get; }
+		public int ChunkSize { get; }
 		public Vector3 LoadReference { get; set; }
-
-		public int MapChunkCount { get { return map.Count; } }
-
-		public int TriangleCount { get { return chunkPool.ActiveObjects.Select(c => c.TriangleCount).Sum(); } }
-
-		public int ViewDistance { get; private set; }
-
-		public Vector3 ViewModifier { get { return new Vector3(ViewDistance, ViewDistance, ViewDistance); } }
-
-		private int FullViewDistance { get { return ViewDistance * 2 + 1; } }
-
-		private int FullViewLength { get { return FullViewDistance * FullViewDistance * FullViewDistance; } }
+		public int DrawChunkCount => chunkPool.ActiveObjects.Count(chunk => chunk.CanDraw);
+		public int MapChunkCount => map?.Count ?? 0;
+		public int TriangleCount => chunkPool.ActiveObjects.Select(c => c.TriangleCount).Sum();
+		public Vector3 ViewModifier => new Vector3(ViewDistance, ViewDistance, ViewDistance);
+		public int FullViewDistance => ViewDistance * 2 + 1;
+		public int FullViewLength => FullViewDistance * FullViewDistance * FullViewDistance;
 
 		public World(App app, int chunkSize, int viewDistance)
 			: base(app)
 		{
 			ChunkSize = chunkSize;
 			ViewDistance = viewDistance;
-			map = new Dictionary<Vector3, Primitives.Chunk>();
-			chunkPool = new ObjectPool<Voxel.Chunk, Vector3>(() => new Chunk(this));
-			bufferedActions = new HashSet<Action>();
 		}
 
 		public void Draw(double time)
 		{
 			foreach (var item in chunkPool.ActiveObjects)
 			{
-				if (item.CanDraw())
+				if (item.CanDraw)
 				{
-					App.ActiveShader.GetMatrix("World").SetMatrix(Matrix.Translation(item.WorldPosition));
-					App.ApplyShader();
+					App.ActiveShader.Matrix("World").SetMatrix(Matrix.Translation(item.WorldPosition));
+					App.ApplyShader("Basic");
 					item.Draw(time);
 				}
 			}
@@ -75,13 +64,7 @@ namespace InstancingPerformance.Voxel
 			chunk.SetBlock(position.Mod(ChunkSize), block);
 		}
 
-		public void SetBlocks(IEnumerable<BlockInsert> inserts)
-		{
-			foreach (var insert in inserts)
-			{
-				SetBlock(insert.Position, insert.Block);
-			}
-		}
+		public void SetBlocks(IEnumerable<BlockInsert> inserts) => inserts.Loop(insert => SetBlock(insert.Position, insert.Block));
 
 		public void Update(double time)
 		{
@@ -97,7 +80,7 @@ namespace InstancingPerformance.Voxel
 
 					if (!chunkPool.ContainsKey(chunkPosition))
 					{
-						Voxel.Chunk voxelChunk = chunkPool.GetObject(chunkPosition);
+						Chunk voxelChunk = chunkPool.GetObject(chunkPosition);
 						voxelChunk.SetChunk(chunk);
 					}
 				}

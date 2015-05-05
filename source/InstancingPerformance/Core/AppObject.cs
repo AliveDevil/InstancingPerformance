@@ -11,25 +11,16 @@ namespace InstancingPerformance.Core
 {
 	public class AppObject : IDisposable
 	{
-		public App App { get; private set; }
-
-		public DeviceContext Context { get { return App.Context; } }
-
-		public Device Device { get { return Context.Device; } }
-
-		public Keyboard Keyboard { get { return App.Keyboard; } }
-
-		public KeyboardState KeyState { get { return App.KeyState; } }
-
-		public Mouse Mouse { get { return App.Mouse; } }
-
-		public MouseState MouseState { get { return App.MouseState; } }
-
-		public ResourceManager ResourceManager { get { return App.ResourceManager; } }
-
-		public ScreenManager ScreenManager { get { return App.ScreenManager; } }
-
-		public SwapChain SwapChain { get { return App.SwapChain; } }
+		public App App { get; }
+		public DeviceContext Context => App?.Context;
+		public Device Device => Context?.Device;
+		public Keyboard Keyboard => App?.Keyboard;
+		public KeyboardState KeyState => App?.KeyState;
+		public Mouse Mouse => App?.Mouse;
+		public MouseState MouseState => App?.MouseState;
+		public ResourceManager ResourceManager => App?.ResourceManager;
+		public ScreenManager ScreenManager => App?.ScreenManager;
+		public SwapChain SwapChain => App?.SwapChain;
 
 		public AppObject(App app)
 		{

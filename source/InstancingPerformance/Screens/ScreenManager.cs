@@ -15,7 +15,7 @@ namespace InstancingPerformance.Screens
 
 		public void Draw(double time)
 		{
-			if (currentScreen != null) currentScreen.Draw(time);
+			currentScreen?.Draw(time);
 		}
 
 		public void SetScreen(Screen screen)
@@ -29,7 +29,7 @@ namespace InstancingPerformance.Screens
 
 		public void Update(double time)
 		{
-			if (currentScreen != null) currentScreen.Update(time);
+			currentScreen?.Update(time);
 		}
 	}
 }

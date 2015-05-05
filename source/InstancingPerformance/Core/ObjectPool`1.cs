@@ -7,45 +7,40 @@ namespace InstancingPerformance.Core
 {
 	public class ObjectPool<T, TPool> where T : IPooled<TPool>
 	{
-		private Dictionary<TPool, T> _active;
-		private Func<T> _objectGenerator;
-		private ConcurrentBag<T> _objects;
+		private Dictionary<TPool, T> active = new Dictionary<TPool, T>();
+		private Func<T> objectFactory;
+		private ConcurrentBag<T> objects = new ConcurrentBag<T>();
 
-		public IEnumerable<T> ActiveObjects { get { return _active.Values; } }
+		public IEnumerable<T> ActiveObjects => active.Values;
 
 		public ObjectPool(Func<T> objectGenerator)
 		{
 			if (objectGenerator == null) throw new ArgumentNullException("objectGenerator");
-			_objects = new ConcurrentBag<T>();
-			_active = new Dictionary<TPool, T>();
-			_objectGenerator = objectGenerator;
+			objectFactory = objectGenerator;
 		}
 
-		public bool ContainsKey(TPool key)
-		{
-			return _active.ContainsKey(key);
-		}
+		public bool ContainsKey(TPool key) => active.ContainsKey(key);
 
 		public T GetObject(TPool key)
 		{
 			T item;
-			if (_objects.TryTake(out item))
+			if (objects.TryTake(out item))
 			{
 				return AddObject(item, key);
 			}
-			return AddObject(_objectGenerator(), key);
+			return AddObject(objectFactory(), key);
 		}
 
 		public void PutObject(T item)
 		{
-			_active.Remove(item.Key);
-			_objects.Add(item);
+			active.Remove(item.Key);
+			objects.Add(item);
 			item.Reset();
 		}
 
 		public void UpdateObjects()
 		{
-			var copy = new Dictionary<TPool, T>(_active);
+			var copy = new Dictionary<TPool, T>(active);
 			foreach (var @object in copy)
 			{
 				if (!@object.Value.IsActive)
@@ -55,7 +50,7 @@ namespace InstancingPerformance.Core
 
 		private T AddObject(T obj, TPool key)
 		{
-			_active.Add(key, obj);
+			active.Add(key, obj);
 			obj.Key = key;
 			return obj;
 		}
