@@ -10,8 +10,6 @@ namespace InstancingPerformance.Core
 	{
 		private Bitmap map;
 
-		private BitmapData mapData;
-
 		public float this[int x, int y]
 		{
 			get
@@ -23,13 +21,10 @@ namespace InstancingPerformance.Core
 			}
 		}
 
-		public float Amplitude { get; private set; }
-
-		public int Height { get; private set; }
-
-		public int Width { get; private set; }
-
-		public int Length { get; private set; }
+		public float Amplitude { get; }
+		public int Height { get; }
+		public int Width { get; }
+		public int Length { get; }
 
 		public Heightmap(App app, float amplitude, string resource)
 			: base(app)
@@ -39,14 +34,12 @@ namespace InstancingPerformance.Core
 			Height = map.Height;
 			Length = Width * Height;
 			Amplitude = amplitude;
-			//mapData = map.LockBits(new Rectangle(0, 0, Width, Height), ImageLockMode.ReadOnly, map.PixelFormat);
 		}
 
 		protected override void Dispose(bool managed)
 		{
 			if (managed)
 			{
-				//map.UnlockBits(mapData);
 				map.Dispose();
 			}
 			base.Dispose(managed);

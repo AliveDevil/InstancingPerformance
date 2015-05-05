@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,22 +12,19 @@ namespace InstancingPerformance.Core
 {
 	public class MapGenerator : IEnumerable<BlockInsert[]>
 	{
-		private Heightmap heightmap;
-		private ColorMap colormap;
-		private int chunkSize;
-		private int chunkWidthCount;
-		private int chunkDepthCount;
-		private int chunkCount;
-		private int batchYield;
+		private Heightmap heightmap { get; }
+		private ColorMap colormap { get; }
+		private int chunkSize { get; }
+		private int batchYield { get; }
+		private int chunkWidthCount => heightmap.Width / chunkSize;
+		private int chunkDepthCount => heightmap.Height / chunkSize;
+		private int chunkCount => chunkWidthCount * chunkDepthCount;
 
 		public MapGenerator(Heightmap heightmap, ColorMap colormap, int chunkSize, int batchYield)
 		{
 			this.heightmap = heightmap;
 			this.colormap = colormap;
 			this.chunkSize = chunkSize;
-			this.chunkWidthCount = heightmap.Width / chunkSize;
-			this.chunkDepthCount = heightmap.Height / chunkSize;
-			this.chunkCount = this.chunkWidthCount * this.chunkDepthCount;
 			this.batchYield = batchYield;
 		}
 
@@ -61,9 +59,6 @@ namespace InstancingPerformance.Core
 				yield return inserts.ToArray();
 		}
 
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-		{
-			return this.GetEnumerator();
-		}
+		IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	}
 }

@@ -23,9 +23,9 @@ namespace InstancingPerformance.Core
 			}
 		}
 
-		public int Height { get; private set; }
+		public int Height { get; }
 
-		public int Width { get; private set; }
+		public int Width { get; }
 
 		public ColorMap(App app, string resource)
 			: base(app)
