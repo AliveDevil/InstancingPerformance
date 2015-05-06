@@ -9,9 +9,9 @@ namespace InstancingPerformance.Voxel
 {
 	public class World : AppObject, IDraw, IUpdate
 	{
-		private HashSet<Action> bufferedActions => new HashSet<Action>();
-		private ObjectPool<Chunk, Vector3> chunkPool => new ObjectPool<Chunk, Vector3>(() => new Chunk(this));
-		private Dictionary<Vector3, Primitives.Chunk> map => new Dictionary<Vector3, Primitives.Chunk>();
+		private HashSet<Action> bufferedActions { get; }
+		private ObjectPool<Chunk, Vector3> chunkPool { get; }
+		private Dictionary<Vector3, Primitives.Chunk> map { get; }
 
 		public int ViewDistance { get; }
 		public int ChunkSize { get; }
@@ -28,7 +28,11 @@ namespace InstancingPerformance.Voxel
 		{
 			ChunkSize = chunkSize;
 			ViewDistance = viewDistance;
-		}
+
+			bufferedActions = new HashSet<Action>();
+			chunkPool = new ObjectPool<Chunk, Vector3>(() => new Chunk(this));
+			map = new Dictionary<Vector3, Primitives.Chunk>();
+        }
 
 		public void Draw(double time)
 		{
@@ -86,7 +90,7 @@ namespace InstancingPerformance.Voxel
 				}
 
 				IEnumerator<Chunk> chunkEnumerator = chunkPool.ActiveObjects.GetEnumerator();
-				while (watch.Elapsed < TimeSpan.FromSeconds(0.033) && chunkEnumerator.MoveNext())
+				while (watch.Elapsed < TimeSpan.FromSeconds(0.016) && chunkEnumerator.MoveNext())
 				{
 					chunkEnumerator.Current.Update(time);
 				}

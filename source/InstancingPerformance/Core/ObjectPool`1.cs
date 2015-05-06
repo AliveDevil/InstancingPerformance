@@ -7,9 +7,9 @@ namespace InstancingPerformance.Core
 {
 	public class ObjectPool<T, TPool> where T : IPooled<TPool>
 	{
-		private Dictionary<TPool, T> active = new Dictionary<TPool, T>();
+		private Dictionary<TPool, T> active { get; } = new Dictionary<TPool, T>();
 		private Func<T> objectFactory;
-		private ConcurrentBag<T> objects = new ConcurrentBag<T>();
+		private ConcurrentBag<T> objects { get; } = new ConcurrentBag<T>();
 
 		public IEnumerable<T> ActiveObjects => active.Values;
 

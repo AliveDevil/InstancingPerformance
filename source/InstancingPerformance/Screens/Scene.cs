@@ -39,7 +39,7 @@ namespace InstancingPerformance.Screens
 			camera.AddWayPoint(new WayPoint(4 * m, 230, 50, 180, 0, -0.1f, 0));
 			camera.AddWayPoint(new WayPoint(5 * m, -232, 32, -232, 440, 1.571f, 0));
 
-			world = new World(App, 16, 8);
+			world = new World(App, 16, 5);
 
 			basicShader = ResourceManager.Shader("Complete.fx",
 				new Dictionary<string, InputElement[]>()
