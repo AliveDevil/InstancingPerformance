@@ -8,26 +8,13 @@ namespace InstancingPerformance
 {
 	public class App : AppWindow
 	{
-		private ResourceManager resourceManager;
+		private Resources resourceManager;
 		private ScreenManager screenManager;
-		private Shader activeShader;
 
-		public Shader ActiveShader => activeShader;
-		public ResourceManager ResourceManager => resourceManager;
+		public Resources ResourceManager => resourceManager;
 		public ScreenManager ScreenManager => screenManager;
 
 		public App() : base("InstancingPerformance") { }
-
-		public void ApplyShader(string passName)
-		{
-			if (activeShader != null)
-			{
-				activeShader.Effect.GetTechniqueByIndex(0).GetPassByIndex(0).Apply(Context);
-				Context.InputAssembler.InputLayout = activeShader.Layout(passName);
-			}
-		}
-
-		public void UseShader(Shader shader) => activeShader = shader;
 
 		protected override void Draw(double time)
 		{
@@ -38,7 +25,7 @@ namespace InstancingPerformance
 
 		protected override void LoadContent()
 		{
-			resourceManager = new ResourceManager(this);
+			resourceManager = new Resources(this);
 			screenManager = new ScreenManager(this);
 			screenManager.SetScreen(new Scene(this));
 		}

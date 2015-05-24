@@ -18,7 +18,7 @@ namespace InstancingPerformance.Core
 		public KeyboardState KeyState => App?.KeyState;
 		public Mouse Mouse => App?.Mouse;
 		public MouseState MouseState => App?.MouseState;
-		public ResourceManager ResourceManager => App?.ResourceManager;
+		public Resources ResourceManager => App?.ResourceManager;
 		public ScreenManager ScreenManager => App?.ScreenManager;
 		public SwapChain SwapChain => App?.SwapChain;
 

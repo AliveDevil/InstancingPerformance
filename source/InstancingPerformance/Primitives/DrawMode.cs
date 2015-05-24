@@ -2,6 +2,6 @@
 {
 	public enum DrawMode
 	{
-		Basic, Hardware, Geometry
+		Basic, Instance, Geometry
 	}
 }

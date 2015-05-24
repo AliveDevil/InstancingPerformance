@@ -1,26 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using InstancingPerformance.Content;
 using InstancingPerformance.Core;
 using InstancingPerformance.Primitives;
 using InstancingPerformance.Voxel;
 using SharpDX;
 using SharpDX.Direct3D11;
-using SharpDX.DirectInput;
 using SharpDX.DXGI;
 
 namespace InstancingPerformance.Screens
 {
 	public class Scene : Screen
 	{
-		private Shader basicShader;
 		private PathCamera camera;
 		private double lastFrameTime;
 		private World world;
-		private DrawMode drawMode;
+		private Shader basicShader;
+		private Shader instanceShader;
+		private Buffer lightBuffer;
+		private Buffer worldBuffer;
+		private LightBuffer lightSetup;
+
+		public DrawMode DrawMode { get { return world.DrawMode; } set { world.DrawMode = value; } }
 
 		public Scene(App app)
 			: base(app)
@@ -39,23 +40,22 @@ namespace InstancingPerformance.Screens
 			camera.AddWayPoint(new WayPoint(4 * m, 230, 50, 180, 0, -0.1f, 0));
 			camera.AddWayPoint(new WayPoint(5 * m, -232, 32, -232, 440, 1.571f, 0));
 
-			world = new World(App, 16, 5);
+			lightBuffer = new Buffer(Device, 64, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
+			worldBuffer = new Buffer(Device, 192, ResourceUsage.Dynamic, BindFlags.ConstantBuffer, CpuAccessFlags.Write, ResourceOptionFlags.None, 0);
 
-			basicShader = ResourceManager.Shader("Complete.fx",
-				new Dictionary<string, InputElement[]>()
-				{
-					{
-						"Basic", new InputElement[]
-						{
-							new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0),
-							new InputElement("NORMAL", 0, Format.R32G32B32_Float, 0),
-							new InputElement("COLOR", 0, Format.R8G8B8A8_UNorm, 0),
-						}
-					}
-				});
+			world = new World(App, worldBuffer, 16, 9);
 
-			using (Heightmap heightmap = new Heightmap(App, 64, "ip_heightmap.png"))
-			using (ColorMap colormap = new ColorMap(App, "ip_color.png"))
+			basicShader = ResourceManager.BasicShader;
+			instanceShader = ResourceManager.InstanceShader;
+
+			lightSetup = new LightBuffer();
+			lightSetup.AmbientColor = Color.White.ToVector4();
+			lightSetup.AmbientIntensity = 0.1f;
+			lightSetup.LightColor = Color.White.ToVector4();
+			lightSetup.LightDirection = Vector3.Normalize(new Vector3(0.25f, -1, 2));
+
+			using (Heightmap heightmap = new Heightmap(App, 64, "IP_HEIGHTMAP"))
+			using (ColorMap colormap = new ColorMap(App, "IP_COLOR"))
 			{
 				MapGenerator chunkGenerator = new MapGenerator(heightmap, colormap, world.ChunkSize, 8);
 				IEnumerator<BlockInsert[]> enumerator = chunkGenerator.GetEnumerator();
@@ -69,16 +69,26 @@ namespace InstancingPerformance.Screens
 					}));
 				}
 			}
+
+			DrawMode = DrawMode.Basic;
 		}
 
 		public override void Draw(double time)
 		{
 			lastFrameTime = time;
-			App.UseShader(basicShader);
-			basicShader.Matrix("View").SetMatrix(camera.View);
-			basicShader.Matrix("Projection").SetMatrix(camera.Projection);
-			basicShader.Vector("LightColor").Set(Color.White);
-			basicShader.Vector("LightDirection").Set(Vector3.Normalize(new Vector3(0.25f, -1, 2)));
+			switch (DrawMode)
+			{
+				case DrawMode.Basic:
+					basicShader.Apply();
+					break;
+				case DrawMode.Instance:
+					instanceShader.Apply();
+					break;
+				case DrawMode.Geometry:
+					break;
+			}
+			Context.VertexShader.SetConstantBuffer(0, worldBuffer);
+			Context.PixelShader.SetConstantBuffer(0, lightBuffer);
 			world.Draw(time);
 		}
 
@@ -87,24 +97,32 @@ namespace InstancingPerformance.Screens
 			camera.Update(time);
 			world.LoadReference = camera.Position.FloorDiv(world.ChunkSize);
 			world.Update(time);
+			world.WorldSetup.View = Matrix.Transpose(camera.View);
+			world.WorldSetup.Projection = Matrix.Transpose(camera.Projection);
 
-			if (KeyState.IsPressed(Key.D))
-			{
-				var dump = new
-				{
-					FrameTime = lastFrameTime,
-					MapChunkCount = world.MapChunkCount,
-					DrawChunkCount = world.DrawChunkCount,
-					TriangleCount = world.TriangleCount
-				};
-				StringBuilder builder = new StringBuilder();
-				builder.AppendLine(string.Format("Dump at {0}", DateTime.Now));
-				builder.AppendLine(string.Format("{0}: {1}", "FrameTime", dump.FrameTime));
-				builder.AppendLine(string.Format("{0}: {1}", "MapChunkCount", dump.MapChunkCount));
-				builder.AppendLine(string.Format("{0}: {1}", "DrawChunkCount", dump.DrawChunkCount));
-				builder.AppendLine(string.Format("{0}: {1}", "TriangleCount", dump.TriangleCount));
-				Trace.TraceInformation(builder.ToString());
-			}
+			DataStream data;
+			DataBox box = Context.MapSubresource(lightBuffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None, out data);
+			using (data)
+				data.Write(lightSetup);
+			Context.UnmapSubresource(lightBuffer, 0);
+
+			//if (KeyState.IsPressed(Key.D))
+			//{
+			//	var dump = new
+			//	{
+			//		FrameTime = lastFrameTime,
+			//		MapChunkCount = world.MapChunkCount,
+			//		DrawChunkCount = world.DrawChunkCount,
+			//		TriangleCount = world.TriangleCount
+			//	};
+			//	StringBuilder builder = new StringBuilder();
+			//	builder.AppendLine(string.Format("Dump at {0}", DateTime.Now));
+			//	builder.AppendLine(string.Format("{0}: {1}", "FrameTime", dump.FrameTime));
+			//	builder.AppendLine(string.Format("{0}: {1}", "MapChunkCount", dump.MapChunkCount));
+			//	builder.AppendLine(string.Format("{0}: {1}", "DrawChunkCount", dump.DrawChunkCount));
+			//	builder.AppendLine(string.Format("{0}: {1}", "TriangleCount", dump.TriangleCount));
+			//	Trace.TraceInformation(builder.ToString());
+			//}
 		}
 	}
 }

@@ -30,25 +30,30 @@ namespace InstancingPerformance.Voxel
 		private int vertexStride;
 		private World world;
 
+		public Primitives.Chunk ActiveChunk { get; private set; }
+
+		public bool CanDraw => vertexBuffer != null;
+
+		public bool IsActive => Helper.Distance(Position, world.LoadReference) <= world.ViewDistance;
+
 		public Vector3 Key
 		{
 			get { return Position; }
 			set { Position = value; }
 		}
-		public Primitives.Chunk ActiveChunk { get; private set; }
-		public DrawMode DrawMode { get; set; }
+
 		public Vector3 Position { get; set; }
-		public bool IsActive => Helper.Distance(Position, world.LoadReference) <= world.ViewDistance;
+
 		public int TriangleCount => meshData.TriangleCount;
+
 		public Vector3 WorldPosition => Position * world.ChunkSize;
-		public bool CanDraw => vertexBuffer != null;
 
 		public Chunk(World world)
 			: base(world.App)
 		{
 			this.world = world;
 			meshData = new MeshData();
-			meshData.UseFace(Face);
+			meshData.UseFace(Face, Vector3.ForwardLH);
 		}
 
 		public void Draw(double time)
@@ -56,15 +61,17 @@ namespace InstancingPerformance.Voxel
 			if (CanDraw)
 			{
 				Context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
-				switch (DrawMode)
+				switch (world.DrawMode)
 				{
 					case DrawMode.Basic:
+						Context.InputAssembler.SetIndexBuffer(indexBuffer, Format.R32_UInt, 0);
 						Context.InputAssembler.SetVertexBuffers(0, vertexBinding);
-						Context.InputAssembler.SetIndexBuffer(indexBuffer, Format.R32_SInt, 0);
 						Context.DrawIndexed(indexCount, 0, 0);
 						break;
 
-					case DrawMode.Hardware:
+					case DrawMode.Instance:
+						Context.InputAssembler.SetIndexBuffer(indexBuffer, Format.R32_UInt, 0);
+						Context.InputAssembler.SetVertexBuffers(0, vertexBinding, instanceBinding);
 						Context.DrawIndexedInstanced(6, instanceCount, 0, 0, 0);
 						break;
 
@@ -77,6 +84,11 @@ namespace InstancingPerformance.Voxel
 		public override int GetHashCode()
 		{
 			return Position.GetHashCode();
+		}
+
+		public void Invalidate()
+		{
+			updateRequired = true;
 		}
 
 		public void Reset()
@@ -111,6 +123,7 @@ namespace InstancingPerformance.Voxel
 
 		private void RenderMesh()
 		{
+			meshData.DrawMode = world.DrawMode;
 			meshData.Create(Device, out vertexStride, out vertexCount, out vertexBuffer, out instanceStride, out instanceCount, out vertexPerInstance, out instanceBuffer, out indexCount, out indexBuffer);
 			vertexBinding = new VertexBufferBinding(vertexBuffer, vertexStride, 0);
 			instanceBinding = new VertexBufferBinding(instanceBuffer, instanceStride, 0);

@@ -1,35 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using InstancingPerformance.Core;
 using SharpDX;
+using SharpDX.D3DCompiler;
 using SharpDX.Direct3D11;
 
 namespace InstancingPerformance.Content
 {
 	public class Shader : AppObject
 	{
-		public Effect Effect { get; }
-		public IDictionary<string, InputLayout> Layouts { get; } = new Dictionary<string, InputLayout>();
+		public VertexShader VertexShader { get; }
+		public PixelShader PixelShader { get; }
+		private ShaderSignature vertexShaderSignature, pixelShaderSignature;
+		private InputLayout layout;
 
-		public Shader(App app, Effect effect, IDictionary<string, InputLayout> layouts)
+		public Shader(App app, VertexShader vertexShader, ShaderSignature vertexShaderSignature, PixelShader pixelShader, ShaderSignature pixelShaderSignature, InputLayout layout)
 			: base(app)
 		{
-			Effect = effect;
-			foreach (var item in layouts)
-			{
-				Layouts.Add(item);
-			}
+			VertexShader = vertexShader;
+			PixelShader = pixelShader;
+			this.vertexShaderSignature = vertexShaderSignature;
+			this.pixelShaderSignature = pixelShaderSignature;
+			this.layout = layout;
 		}
 
-		public EffectMatrixVariable Matrix(string name) => Effect.GetVariableByName(name).AsMatrix();
-		public EffectPass Pass(int index) => Effect.GetTechniqueByIndex(0).GetPassByIndex(index);
-		public EffectVectorVariable Vector(string name) => Effect.GetVariableByName(name).AsVector();
-		public void SetCamera(string name, Matrix world, Matrix view, Matrix projection) => Matrix(name).SetMatrix(world * view * projection);
-
-		public InputLayout Layout(string pass)
+		public void Apply()
 		{
-			InputLayout layout;
-			Layouts.TryGetValue(pass, out layout);
-			return layout;
+			Context.VertexShader.Set(VertexShader);
+			Context.PixelShader.Set(PixelShader);
+			Context.InputAssembler.InputLayout = layout;
 		}
 	}
 }

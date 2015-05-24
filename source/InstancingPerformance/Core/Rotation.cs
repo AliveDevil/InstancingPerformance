@@ -6,10 +6,14 @@ namespace InstancingPerformance.Core
 {
 	public struct Rotation
 	{
+		const double DegRadD = 0.017453292519943296;
+		const float DegRadF = (float)DegRadD;
+
 		private bool changed;
 		private float pitch;
 		private float roll;
 		private float yaw;
+		private Matrix matrix;
 
 		public float Pitch
 		{
@@ -55,7 +59,21 @@ namespace InstancingPerformance.Core
 			this.yaw = yaw;
 			this.pitch = pitch;
 			this.roll = roll;
-			this.changed = true;
+			matrix = Matrix.RotationYawPitchRoll(MathUtil.DegreesToRadians(yaw), MathUtil.DegreesToRadians(pitch), MathUtil.DegreesToRadians(roll));
+			changed = false;
+		}
+
+		public Matrix Matrix
+		{
+			get
+			{
+				if (changed)
+				{
+					changed = false;
+					matrix = Matrix.RotationYawPitchRoll(MathUtil.DegreesToRadians(yaw), MathUtil.DegreesToRadians(pitch), MathUtil.DegreesToRadians(roll));
+				}
+				return matrix;
+			}
 		}
 
 		public static Vector3 operator *(Vector3 v, Rotation r)
@@ -69,14 +87,13 @@ namespace InstancingPerformance.Core
 			 * and Math.PI.
 			 */
 
-			const double DegRad = 0.017453292519943296;
-			double yaw = (double)r.Yaw * DegRad;
-			double pitch = (double)r.Pitch * DegRad;
-			double roll = (double)r.Roll * DegRad;
+			double yaw = r.Yaw * DegRadD;
+			double pitch = r.Pitch * DegRadD;
+			double roll = r.Roll * DegRadD;
 
-			double  halfRoll = roll * 0.5f;
-			double  halfPitch = pitch * 0.5f;
-			double  halfYaw = yaw * 0.5f;
+			double halfRoll = roll * 0.5f;
+			double halfPitch = pitch * 0.5f;
+			double halfYaw = yaw * 0.5f;
 
 			double sinRoll = Math.Sin(halfRoll);
 			double cosRoll = Math.Cos(halfRoll);

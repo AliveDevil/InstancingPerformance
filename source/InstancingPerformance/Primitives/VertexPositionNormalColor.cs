@@ -3,7 +3,7 @@ using SharpDX;
 
 namespace InstancingPerformance.Primitives
 {
-	[StructLayout(LayoutKind.Explicit, Size = 20)]
+	[StructLayout(LayoutKind.Explicit, Size = 44)]
 	public struct VertexPositionNormalColor
 	{
 		[FieldOffset(0)]
@@ -13,7 +13,7 @@ namespace InstancingPerformance.Primitives
 		public Vector3 Normal; // 12
 
 		[FieldOffset(28)]
-		public Color Color; // 4
+		public Vector4 Color; // 16
 
 		public VertexPositionNormalColor(Vector3 position, Vector3 normal, Color color)
 			: this(new Vector4(position, 1), normal, color)
@@ -24,7 +24,7 @@ namespace InstancingPerformance.Primitives
 		{
 			Position = position;
 			Normal = normal;
-			Color = color;
+			Color = color.ToVector4();
 		}
 	}
 }

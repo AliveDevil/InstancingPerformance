@@ -4,14 +4,19 @@ using System.Linq;
 using InstancingPerformance.Core;
 using InstancingPerformance.Primitives;
 using SharpDX;
+using SharpDX.Direct3D11;
+using Buffer = SharpDX.Direct3D11.Buffer;
 
 namespace InstancingPerformance.Voxel
 {
 	public class World : AppObject, IDraw, IUpdate
 	{
+		private DrawMode drawMode;
+
 		private HashSet<Action> bufferedActions { get; }
 		private ObjectPool<Chunk, Vector3> chunkPool { get; }
 		private Dictionary<Vector3, Primitives.Chunk> map { get; }
+		private Buffer worldBuffer { get; }
 
 		public int ViewDistance { get; }
 		public int ChunkSize { get; }
@@ -22,9 +27,21 @@ namespace InstancingPerformance.Voxel
 		public Vector3 ViewModifier => new Vector3(ViewDistance, ViewDistance, ViewDistance);
 		public int FullViewDistance => ViewDistance * 2 + 1;
 		public int FullViewLength => FullViewDistance * FullViewDistance * FullViewDistance;
+		public WorldBuffer WorldSetup;
 
-		public World(App app, int chunkSize, int viewDistance)
-			: base(app)
+		public DrawMode DrawMode
+		{
+			get { return drawMode; }
+			set
+			{
+				drawMode = value;
+				foreach (var chunk in chunkPool.ActiveObjects)
+					chunk.Invalidate();
+			}
+		}
+
+		public World(App app, Buffer worldBuffer, int chunkSize, int viewDistance)
+		: base(app)
 		{
 			ChunkSize = chunkSize;
 			ViewDistance = viewDistance;
@@ -32,7 +49,8 @@ namespace InstancingPerformance.Voxel
 			bufferedActions = new HashSet<Action>();
 			chunkPool = new ObjectPool<Chunk, Vector3>(() => new Chunk(this));
 			map = new Dictionary<Vector3, Primitives.Chunk>();
-        }
+			this.worldBuffer = worldBuffer;
+		}
 
 		public void Draw(double time)
 		{
@@ -40,8 +58,11 @@ namespace InstancingPerformance.Voxel
 			{
 				if (item.CanDraw)
 				{
-					App.ActiveShader.Matrix("World").SetMatrix(Matrix.Translation(item.WorldPosition));
-					App.ApplyShader("Basic");
+					WorldSetup.World = Matrix.Transpose(Matrix.Translation(item.WorldPosition));
+					DataStream data;
+					Context.MapSubresource(worldBuffer, 0, MapMode.WriteDiscard, MapFlags.None, out data);
+					using (data) data.Write(WorldSetup);
+					Context.UnmapSubresource(worldBuffer, 0);
 					item.Draw(time);
 				}
 			}
@@ -95,14 +116,6 @@ namespace InstancingPerformance.Voxel
 					chunkEnumerator.Current.Update(time);
 				}
 			}
-		}
-
-		public void UseBasicMode()
-		{
-		}
-
-		public void UseHardwareMode()
-		{
 		}
 	}
 }
