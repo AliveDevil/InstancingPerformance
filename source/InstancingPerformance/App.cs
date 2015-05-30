@@ -1,5 +1,6 @@
 ﻿using InstancingPerformance.Content;
 using InstancingPerformance.Core;
+using InstancingPerformance.Primitives;
 using InstancingPerformance.Screens;
 using SharpDX;
 using SharpDX.Direct3D11;
@@ -11,10 +12,16 @@ namespace InstancingPerformance
 		private Resources resourceManager;
 		private ScreenManager screenManager;
 
+		public DrawMode DrawMode { get; }
+
 		public Resources ResourceManager => resourceManager;
+
 		public ScreenManager ScreenManager => screenManager;
 
-		public App() : base("InstancingPerformance") { }
+		public App(DrawMode drawMode) : base("InstancingPerformance")
+		{
+			DrawMode = drawMode;
+		}
 
 		protected override void Draw(double time)
 		{

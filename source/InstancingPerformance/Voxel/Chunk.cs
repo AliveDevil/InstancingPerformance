@@ -60,7 +60,7 @@ namespace InstancingPerformance.Voxel
 		{
 			if (CanDraw)
 			{
-				switch (world.DrawMode)
+				switch (App.DrawMode)
 				{
 					case DrawMode.Basic:
 						Context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
@@ -127,7 +127,7 @@ namespace InstancingPerformance.Voxel
 
 		private void RenderMesh()
 		{
-			meshData.DrawMode = world.DrawMode;
+			meshData.DrawMode = App.DrawMode;
 			meshData.Create(Device, out vertexStride, out vertexCount, out vertexBuffer, out instanceStride, out instanceCount, out vertexPerInstance, out instanceBuffer, out indexCount, out indexBuffer);
 			vertexBinding = new VertexBufferBinding(vertexBuffer, vertexStride, 0);
 			instanceBinding = new VertexBufferBinding(instanceBuffer, instanceStride, 0);

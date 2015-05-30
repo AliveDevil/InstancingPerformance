@@ -24,8 +24,6 @@ namespace InstancingPerformance.Screens
 		private Buffer worldBuffer;
 		private LightBuffer lightSetup;
 
-		public DrawMode DrawMode { get { return world.DrawMode; } set { world.DrawMode = value; } }
-
 		public Scene(App app)
 			: base(app)
 		{
@@ -73,14 +71,12 @@ namespace InstancingPerformance.Screens
 					}));
 				}
 			}
-
-			DrawMode = DrawMode.Instance;
 		}
 
 		public override void Draw(double time)
 		{
 			lastFrameTime = time;
-			switch (DrawMode)
+			switch (App.DrawMode)
 			{
 				case DrawMode.Basic:
 					basicShader.Apply();
@@ -111,24 +107,6 @@ namespace InstancingPerformance.Screens
 			using (data)
 				data.Write(lightSetup);
 			Context.UnmapSubresource(lightBuffer, 0);
-
-			//if (KeyState.IsPressed(Key.D))
-			//{
-			//	var dump = new
-			//	{
-			//		FrameTime = lastFrameTime,
-			//		MapChunkCount = world.MapChunkCount,
-			//		DrawChunkCount = world.DrawChunkCount,
-			//		TriangleCount = world.TriangleCount
-			//	};
-			//	StringBuilder builder = new StringBuilder();
-			//	builder.AppendLine(string.Format("Dump at {0}", DateTime.Now));
-			//	builder.AppendLine(string.Format("{0}: {1}", "FrameTime", dump.FrameTime));
-			//	builder.AppendLine(string.Format("{0}: {1}", "MapChunkCount", dump.MapChunkCount));
-			//	builder.AppendLine(string.Format("{0}: {1}", "DrawChunkCount", dump.DrawChunkCount));
-			//	builder.AppendLine(string.Format("{0}: {1}", "TriangleCount", dump.TriangleCount));
-			//	Trace.TraceInformation(builder.ToString());
-			//}
 		}
 	}
 }

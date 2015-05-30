@@ -1,11 +1,13 @@
-﻿namespace InstancingPerformance
+﻿using System;
+using InstancingPerformance.Primitives;
+
+namespace InstancingPerformance
 {
 	internal static class Program
 	{
-		private static void Main()
+		private static void Main(string[] args)
 		{
-			Manager manager = new Manager();
-			using (App app = new App())
+			using (App app = new App((DrawMode)Enum.Parse(typeof(DrawMode), args[0])))
 			{
 				app.Run();
 			}

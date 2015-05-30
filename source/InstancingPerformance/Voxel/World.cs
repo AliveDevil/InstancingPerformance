@@ -29,17 +29,6 @@ namespace InstancingPerformance.Voxel
 		public int FullViewLength => FullViewDistance * FullViewDistance * FullViewDistance;
 		public WorldBuffer WorldSetup;
 
-		public DrawMode DrawMode
-		{
-			get { return drawMode; }
-			set
-			{
-				drawMode = value;
-				foreach (var chunk in chunkPool.ActiveObjects)
-					chunk.Invalidate();
-			}
-		}
-
 		public World(App app, Buffer worldBuffer, int chunkSize, int viewDistance)
 		: base(app)
 		{
