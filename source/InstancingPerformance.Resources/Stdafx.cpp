@@ -22,7 +22,7 @@ HINSTANCE __stdcall GetCurrentInstance()
 #ifdef _M_IX86
 		mov eax, [esp]
 		push eax
-		jmp GetInstanceFromAddress
+			jmp GetInstanceFromAddress
 #else
 # error This machine type is not supported.
 #endif
@@ -33,7 +33,7 @@ HMODULE GetCurrentModuleHandle()
 {
 	HMODULE hMod = NULL;
 	GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-		reinterpret_cast<LPCWSTR>(&GetCurrentModuleHandle),
-		&hMod);
+					   reinterpret_cast<LPCWSTR>(&GetCurrentModuleHandle),
+					   &hMod);
 	return hMod;
 }

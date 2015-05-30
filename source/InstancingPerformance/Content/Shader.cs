@@ -13,16 +13,19 @@ namespace InstancingPerformance.Content
 	public class Shader : AppObject
 	{
 		public VertexShader VertexShader { get; }
+		public GeometryShader GeometryShader { get; }
 		public PixelShader PixelShader { get; }
-		private ShaderSignature vertexShaderSignature, pixelShaderSignature;
+		private ShaderSignature vertexShaderSignature, geometryShaderSignature, pixelShaderSignature;
 		private InputLayout layout;
 
-		public Shader(App app, VertexShader vertexShader, ShaderSignature vertexShaderSignature, PixelShader pixelShader, ShaderSignature pixelShaderSignature, InputLayout layout)
+		public Shader(App app, VertexShader vertexShader, ShaderSignature vertexShaderSignature, GeometryShader geometryShader, ShaderSignature geometryShaderSignature, PixelShader pixelShader, ShaderSignature pixelShaderSignature, InputLayout layout)
 			: base(app)
 		{
 			VertexShader = vertexShader;
+			GeometryShader = geometryShader;
 			PixelShader = pixelShader;
 			this.vertexShaderSignature = vertexShaderSignature;
+			this.geometryShaderSignature = geometryShaderSignature;
 			this.pixelShaderSignature = pixelShaderSignature;
 			this.layout = layout;
 		}
@@ -30,6 +33,7 @@ namespace InstancingPerformance.Content
 		public void Apply()
 		{
 			Context.VertexShader.Set(VertexShader);
+			Context.GeometryShader.Set(GeometryShader);
 			Context.PixelShader.Set(PixelShader);
 			Context.InputAssembler.InputLayout = layout;
 		}

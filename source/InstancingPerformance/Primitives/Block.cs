@@ -29,7 +29,7 @@ namespace InstancingPerformance.Primitives
 
 		public void MeshData(Primitives.Chunk chunk, int x, int y, int z, MeshData meshData)
 		{
-			int c = 0;
+			uint c = 0;
 
 			if (Solid)
 			{
@@ -65,7 +65,7 @@ namespace InstancingPerformance.Primitives
 				}
 			}
 
-			if (c > 0 && c < 0x3F)
+			if (c > 0 && c < 0x40)
 			{
 				meshData.AddGeometryInfo(new Vector3(x, y, z), Color, c);
 			}

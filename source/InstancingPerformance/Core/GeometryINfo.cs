@@ -10,10 +10,10 @@ namespace InstancingPerformance.Core
 	public struct GeometryInfo
 	{
 		public Vector3 Position;
-		public int Case;
+		public uint Case;
 		public Color Color;
 
-		public GeometryInfo(Vector3 position, Color color, int @case)
+		public GeometryInfo(Vector3 position, Color color, uint @case)
 		{
 			Position = position;
 			Case = @case;

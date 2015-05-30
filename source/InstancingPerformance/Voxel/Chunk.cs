@@ -60,22 +60,26 @@ namespace InstancingPerformance.Voxel
 		{
 			if (CanDraw)
 			{
-				Context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 				switch (world.DrawMode)
 				{
 					case DrawMode.Basic:
+						Context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 						Context.InputAssembler.SetIndexBuffer(indexBuffer, Format.R32_UInt, 0);
 						Context.InputAssembler.SetVertexBuffers(0, vertexBinding);
 						Context.DrawIndexed(indexCount, 0, 0);
 						break;
 
 					case DrawMode.Instance:
+						Context.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleList;
 						Context.InputAssembler.SetIndexBuffer(indexBuffer, Format.R32_UInt, 0);
 						Context.InputAssembler.SetVertexBuffers(0, vertexBinding, instanceBinding);
 						Context.DrawIndexedInstanced(6, instanceCount, 0, 0, 0);
 						break;
 
 					case DrawMode.Geometry:
+						Context.InputAssembler.PrimitiveTopology = PrimitiveTopology.PointList;
+						Context.InputAssembler.SetVertexBuffers(0, vertexBinding);
+						Context.Draw(vertexCount, 0);
 						break;
 				}
 			}

@@ -3,6 +3,9 @@
 #include "PixelShader.h"
 #include "VertexShaderBasic.h"
 #include "VertexShaderInstance.h"
+#include "VertexShaderGeometry.h"
+#include "GeometryShader.h"
+
 using namespace System::Runtime::InteropServices;
 
 Manager::Manager()
@@ -11,40 +14,48 @@ Manager::Manager()
 	LoadPixelShader();
 	LoadVertexShaderBasic();
 	LoadVertexShaderInstance();
+	LoadVertexShaderGeometry();
+	LoadGeometryShader();
 }
 
-void Manager::LoadPixelShader() {
-	int count = _countof(g_PS);
-	pixelShader = gcnew array<Byte>(count);
-	pin_ptr<Byte> pinPtrArray = &pixelShader[0];
-	memcpy_s(pinPtrArray, count, &g_PS[0], count);
+void Manager::LoadPixelShader()
+{
+	pixelShader = BuildBuffer<Byte, Byte>(g_PS, _countof(g_PS));
 }
-void Manager::LoadVertexShaderBasic() {
-	int count = _countof(g_VSBasic);
-	vertexShaderBasic = gcnew array<Byte>(count);
-	pin_ptr<Byte> pinPtrArray = &vertexShaderBasic[0];
-	memcpy_s(pinPtrArray, count, &g_VSBasic[0], count);
+void Manager::LoadVertexShaderBasic()
+{
+	vertexShaderBasic = BuildBuffer<Byte, Byte>(g_VSBasic, _countof(g_VSBasic));
 }
-void Manager::LoadVertexShaderInstance() {
-	int count = _countof(g_VSInstance);
-	vertxShaderInstance = gcnew array<Byte>(count);
-	pin_ptr<Byte> pinPtrArray = &vertxShaderInstance[0];
-	memcpy_s(pinPtrArray, count, &g_VSInstance[0], count);
+void Manager::LoadVertexShaderInstance()
+{
+	vertexShaderInstance = BuildBuffer<Byte, Byte>(g_VSInstance, _countof(g_VSInstance));
 }
-array<Byte>^ Manager::Resource(String^ name) {
+void Manager::LoadVertexShaderGeometry()
+{
+	vertexShaderGeometry = BuildBuffer<Byte, Byte>(g_VSGeometry, _countof(g_VSGeometry));
+}
+void Manager::LoadGeometryShader()
+{
+	geometryShader = BuildBuffer<Byte, Byte>(g_GS, _countof(g_GS));
+}
+array<Byte>^ Manager::Resource(String^ name)
+{
 	pin_ptr<const wchar_t> pName = PtrToStringChars(name);
 	const wchar_t* wname = pName;
 	HRSRC resource;
-	if (!(resource = FindResourceW(currentModule, wname, RT_RCDATA))) {
+	if (!(resource = FindResourceW(currentModule, wname, RT_RCDATA)))
+	{
 		return nullptr;
 	}
 	HGLOBAL resourceInfo;
-	if (!(resourceInfo = LoadResource(currentModule, resource))) {
+	if (!(resourceInfo = LoadResource(currentModule, resource)))
+	{
 		return nullptr;
 	}
 	int size = SizeofResource(currentModule, resource);
 	void* dataAddress;
-	if (!(dataAddress = LockResource(resourceInfo))) {
+	if (!(dataAddress = LockResource(resourceInfo)))
+	{
 		return nullptr;
 	}
 

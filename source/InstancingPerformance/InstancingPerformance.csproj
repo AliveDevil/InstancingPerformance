@@ -41,6 +41,9 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Iconshow-General-Performance.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
@@ -108,11 +111,17 @@
     <Compile Include="Primitives\Face.cs" />
     <Compile Include="Primitives\LightBuffer.cs" />
     <Compile Include="Primitives\Quad.cs" />
+    <Compile Include="Primitives\VertexPositionCaseColor.cs" />
     <Compile Include="Primitives\VertexPositionNormalColor.cs" />
     <Compile Include="Primitives\VertexPositionNormal.cs" />
     <Compile Include="Primitives\VertexWorldRotationColor.cs" />
     <Compile Include="Primitives\WorldBuffer.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Screens\Scene.cs" />
     <Compile Include="Screens\Screen.cs" />
     <Compile Include="Screens\ScreenManager.cs" />
@@ -125,6 +134,15 @@
       <Project>{cf6b0395-e839-4af0-a2d7-05bcecf8e9c4}</Project>
       <Name>InstancingPerformance.Resources</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Iconshow-General-Performance.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />

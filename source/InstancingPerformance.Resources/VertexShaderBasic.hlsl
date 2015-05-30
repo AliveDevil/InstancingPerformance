@@ -1,3 +1,5 @@
+#include "Constants.hlsl"
+
 cbuffer VS : register(b0)
 {
 	float4x4 World;
@@ -5,20 +7,11 @@ cbuffer VS : register(b0)
 	float4x4 Projection;
 };
 
-struct VS_OUT
+PSIn VSBasic(VSBasicIn input)
 {
-	float4 position : SV_POSITION;
-	float3 normal : NORMAL;
-	float4 color : COLOR;
-};
-
-VS_OUT VSBasic(float4 position : POSITION, float3 normal : NORMAL, float4 color : COLOR)
-{
-	VS_OUT output;
-	output.position = mul(position, World);
-	output.position = mul(output.position, View);
-	output.position = mul(output.position, Projection);
-	output.color = color;
-	output.normal = normalize(normal);
+	PSIn output;
+	output.Position = mul(mul(mul(input.Position, World), View), Projection);
+	output.Color = input.Color;
+	output.Normal = normalize(input.Normal);
 	return output;
 }

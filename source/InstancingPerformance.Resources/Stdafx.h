@@ -12,3 +12,12 @@
 HINSTANCE __stdcall GetInstanceFromAddress(PVOID pEip);
 HINSTANCE __stdcall GetCurrentInstance();
 HMODULE GetCurrentModuleHandle();
+
+template<typename TSource, typename TDestination>
+array<TDestination>^ BuildBuffer(const TSource* source, size_t count)
+{
+	array<TDestination>^ destination = gcnew array<TDestination>(count);
+	pin_ptr<TDestination> pinPtrArray = &destination[0];
+	memcpy_s(pinPtrArray, count, source, count);
+	return destination;
+}

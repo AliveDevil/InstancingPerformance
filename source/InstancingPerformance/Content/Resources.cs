@@ -11,6 +11,7 @@ namespace InstancingPerformance.Content
 	public class Resources : AppObject
 	{
 		private Shader basicShader;
+		private Shader geometryShader;
 		private Shader instanceShader;
 		Manager manager = new Manager();
 
@@ -26,7 +27,7 @@ namespace InstancingPerformance.Content
 					ShaderSignature vSignature = new ShaderSignature(manager.VertexShaderBasic);
 					PixelShader pShader = new PixelShader(Device, manager.PixelShader);
 					ShaderSignature pSignature = new ShaderSignature(manager.PixelShader);
-					basicShader = new Shader(App, vShader, vSignature, pShader, pSignature, new InputLayout(Device, vSignature, new[]
+					basicShader = new Shader(App, vShader, vSignature, null, null, pShader, pSignature, new InputLayout(Device, vSignature, new[]
 					{
 						new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 0, InputClassification.PerVertexData, 0),
 						new InputElement("NORMAL", 0, Format.R32G32B32_Float, 16, 0, InputClassification.PerVertexData, 0),
@@ -34,6 +35,29 @@ namespace InstancingPerformance.Content
 					}));
 				}
 				return basicShader;
+			}
+		}
+
+		public Shader GeometryShader
+		{
+			get
+			{
+				if (geometryShader == null)
+				{
+					VertexShader vShader = new VertexShader(Device, manager.VertexShaderGeometry);
+					ShaderSignature vSignature = new ShaderSignature(manager.VertexShaderGeometry);
+					GeometryShader gShader = new GeometryShader(Device, manager.GeometryShader);
+					ShaderSignature gSignature = new ShaderSignature(manager.GeometryShader);
+					PixelShader pShader = new PixelShader(Device, manager.PixelShader);
+					ShaderSignature pSignature = new ShaderSignature(manager.PixelShader);
+					geometryShader = new Shader(App, vShader, vSignature, gShader, gSignature, pShader, pSignature, new InputLayout(Device, vSignature, new[]
+					{
+						new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 0, InputClassification.PerVertexData, 0),
+						new InputElement("CASE", 0, Format.R32_UInt, 16, 0, InputClassification.PerVertexData, 0),
+						new InputElement("COLOR", 0, Format.R32G32B32A32_Float, 20, 0, InputClassification.PerVertexData, 0)
+					}));
+				}
+				return geometryShader;
 			}
 		}
 
@@ -47,7 +71,7 @@ namespace InstancingPerformance.Content
 					ShaderSignature vSignature = new ShaderSignature(manager.VertexShaderInstance);
 					PixelShader pShader = new PixelShader(Device, manager.PixelShader);
 					ShaderSignature pSignature = new ShaderSignature(manager.PixelShader);
-					instanceShader = new Shader(App, vShader, vSignature, pShader, pSignature, new InputLayout(Device, vSignature, new[]
+					instanceShader = new Shader(App, vShader, vSignature, null, null, pShader, pSignature, new InputLayout(Device, vSignature, new[]
 					{
 						new InputElement("POSITION", 0, Format.R32G32B32A32_Float, 0, 0, InputClassification.PerVertexData, 0),
 						new InputElement("NORMAL", 0, Format.R32G32B32_Float, 16, 0, InputClassification.PerVertexData, 0),

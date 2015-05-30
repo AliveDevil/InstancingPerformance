@@ -33,6 +33,12 @@
     <ClInclude Include="resource.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="GeometryShader.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexShaderGeometry.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp">
@@ -44,9 +50,6 @@
     <ClCompile Include="Manager.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc">
@@ -68,5 +71,8 @@
     <FxCompile Include="PixelShader.hlsl" />
     <FxCompile Include="VertexShaderBasic.hlsl" />
     <FxCompile Include="VertexShaderInstance.hlsl" />
+    <FxCompile Include="Constants.hlsl" />
+    <FxCompile Include="GeometryShader.hlsl" />
+    <FxCompile Include="VertexShaderGeometry.hlsl" />
   </ItemGroup>
 </Project>

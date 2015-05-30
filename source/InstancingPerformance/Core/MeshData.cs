@@ -31,7 +31,7 @@ namespace InstancingPerformance.Core
 			count++;
 		}
 
-		public void AddGeometryInfo(Vector3 position, Color color, int @case)
+		public void AddGeometryInfo(Vector3 position, Color color, uint @case)
 		{
 			GeometryInfos.Add(new GeometryInfo(position, color, @case));
 		}
@@ -134,8 +134,20 @@ namespace InstancingPerformance.Core
 						break;
 					}
 
-					//case DrawMode.Geometry:
-					//	break;
+				case DrawMode.Geometry:
+					{
+						vertexStride = (4 * 4) + 4 + (4 * 4);
+						List<VertexPositionCaseColor> vertices = new List<VertexPositionCaseColor>();
+						for (int i = 0; i < GeometryInfos.Count; i++)
+						{
+							GeometryInfo info = GeometryInfos[i];
+							vertices.Add(new VertexPositionCaseColor(info.Position, info.Case, info.Color));
+						}
+						vertexCount = vertices.Count;
+						if (vertexCount > 0)
+							vertexBuffer = Buffer.Create(device, BindFlags.VertexBuffer, vertices.ToArray(), vertexStride * vertexCount, ResourceUsage.Immutable, CpuAccessFlags.None, ResourceOptionFlags.None, vertexStride);
+						break;
+					}
 			}
 		}
 

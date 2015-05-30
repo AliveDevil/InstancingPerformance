@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Windows.Forms;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
@@ -46,6 +47,7 @@ namespace InstancingPerformance.Core
 		public AppWindow(string title)
 		{
 			window = new RenderForm(title);
+			window.Icon = Properties.Resources.Iconshow_General_Performance;
 			window.ClientSize = new Size((int)ScreenSize.X, (int)ScreenSize.Y);
 
 			bool isWindowed = true;
