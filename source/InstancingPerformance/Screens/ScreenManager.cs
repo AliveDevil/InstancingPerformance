@@ -1,4 +1,5 @@
-﻿using InstancingPerformance.Core;
+﻿using System;
+using InstancingPerformance.Core;
 
 namespace InstancingPerformance.Screens
 {
@@ -13,9 +14,9 @@ namespace InstancingPerformance.Screens
 		{
 		}
 
-		public void Draw(double time)
+		public void Draw(TimeSpan totalTime, TimeSpan frameTime, double time)
 		{
-			currentScreen?.Draw(time);
+			currentScreen?.Draw(totalTime, frameTime, time);
 		}
 
 		public void SetScreen(Screen screen)

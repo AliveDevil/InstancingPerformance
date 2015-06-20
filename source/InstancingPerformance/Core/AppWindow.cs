@@ -46,6 +46,7 @@ namespace InstancingPerformance.Core
 
 		public AppWindow(string title)
 		{
+			Trace.TraceInformation("Initializing Graphics");
 			window = new RenderForm(title);
 			window.Icon = Properties.Resources.Iconshow_General_Performance;
 			window.ClientSize = new Size((int)ScreenSize.X, (int)ScreenSize.Y);
@@ -81,6 +82,11 @@ namespace InstancingPerformance.Core
 			MouseState = new MouseState();
 		}
 
+		public void Close()
+		{
+			window.Close();
+		}
+
 		public void Dispose()
 		{
 			Keyboard.Unacquire();
@@ -103,7 +109,7 @@ namespace InstancingPerformance.Core
 			UnloadContent();
 		}
 
-		protected virtual void Draw(double time)
+		protected virtual void Draw(TimeSpan totalTime, TimeSpan frameTime, double time)
 		{ }
 
 		protected virtual void LateUpdate()
@@ -125,6 +131,7 @@ namespace InstancingPerformance.Core
 			Utilities.Dispose(ref depthBuffer);
 			Utilities.Dispose(ref depthView);
 
+			Trace.TraceInformation("Building new buffer");
 			swapChain.ResizeBuffers(swapChainDescription.BufferCount, (int)ScreenSize.X, (int)ScreenSize.Y, Format.Unknown, SwapChainFlags.None);
 			backBuffer = Resource.FromSwapChain<Texture2D>(swapChain, 0);
 			renderView = new RenderTargetView(graphicsDevice, backBuffer);
@@ -188,7 +195,7 @@ namespace InstancingPerformance.Core
 
 			double alpha = accumulator.TotalSeconds / dt.TotalSeconds;
 
-			Draw(alpha);
+			Draw(newTime, frameTime, alpha);
 			swapChain.Present(0, PresentFlags.None);
 		}
 	}

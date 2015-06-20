@@ -1,7 +1,9 @@
-﻿namespace InstancingPerformance.Core
+﻿using System;
+
+namespace InstancingPerformance.Core
 {
 	public interface IDraw
 	{
-		void Draw(double time);
+		void Draw(TimeSpan totalTime, TimeSpan frameTime, double time);
 	}
 }

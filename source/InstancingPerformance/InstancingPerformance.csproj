@@ -23,7 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -87,7 +87,12 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Threading.Tasks.Dataflow, Version=4.5.24.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Tpl.Dataflow.4.5.24\lib\portable-net45+win8+wpa81\System.Threading.Tasks.Dataflow.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +113,7 @@
     <Compile Include="Core\PathCamera.cs" />
     <Compile Include="Core\Rotation.cs" />
     <Compile Include="Core\SpriteBatch.cs" />
+    <Compile Include="Core\Statistics.cs" />
     <Compile Include="Core\Watch.cs" />
     <Compile Include="Core\WayPoint.cs" />
     <Compile Include="Helper.cs" />
@@ -134,6 +140,7 @@
     <Compile Include="Screens\Scene.cs" />
     <Compile Include="Screens\Screen.cs" />
     <Compile Include="Screens\ScreenManager.cs" />
+    <Compile Include="Listener\FileTraceListener.cs" />
     <Compile Include="Voxel\BlockInsert.cs" />
     <Compile Include="Voxel\Chunk.cs" />
     <Compile Include="Voxel\World.cs" />

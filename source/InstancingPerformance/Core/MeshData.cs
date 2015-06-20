@@ -18,8 +18,8 @@ namespace InstancingPerformance.Core
 		public List<Rotation> Rotations = new List<Rotation>();
 		private int count = 0;
 
+		public int GraphicsVertexCount { get; private set; }
 		public int TriangleCount { get; private set; }
-
 		public int VertexCount { get; private set; }
 
 		public void AddFace(Vector3 position, Rotation rotation, Color color, Vector3 normal)
@@ -99,8 +99,9 @@ namespace InstancingPerformance.Core
 							vertexBuffer = Buffer.Create(device, BindFlags.VertexBuffer, vertices.ToArray(), vertexStride * vertexCount, ResourceUsage.Immutable, CpuAccessFlags.None, ResourceOptionFlags.None, vertexStride);
 						if (indexCount > 0)
 							indexBuffer = Buffer.Create(device, BindFlags.IndexBuffer, indices.ToArray(), 4 * indexCount, ResourceUsage.Immutable, CpuAccessFlags.None, ResourceOptionFlags.None, 4);
-						//TriangleCount = indexCount / 3;
-						//VertexCount = vertexCount;
+						VertexCount = vertexCount;
+						GraphicsVertexCount = indexCount;
+						TriangleCount = indexCount / 3;
 						break;
 					}
 
@@ -131,21 +132,29 @@ namespace InstancingPerformance.Core
 							instanceBuffer = Buffer.Create(device, BindFlags.VertexBuffer, instances.ToArray(), instanceStride * instanceCount, ResourceUsage.Immutable, CpuAccessFlags.None, ResourceOptionFlags.None, instanceStride);
 						if (indexCount > 0)
 							indexBuffer = Buffer.Create(device, BindFlags.IndexBuffer, indices, 4 * indexCount, ResourceUsage.Default, CpuAccessFlags.None, ResourceOptionFlags.None, 4);
+						VertexCount = vertexCount + instanceCount;
+						GraphicsVertexCount = instanceCount * indexCount;
+						TriangleCount = (instanceCount * indexCount) / 3;
 						break;
 					}
 
 				case DrawMode.Geometry:
 					{
+						int tempVertexCount = 0;
 						vertexStride = (4 * 4) + 4 + (4 * 4);
 						List<VertexPositionCaseColor> vertices = new List<VertexPositionCaseColor>();
 						for (int i = 0; i < GeometryInfos.Count; i++)
 						{
 							GeometryInfo info = GeometryInfos[i];
+							tempVertexCount += info.VertexCount;
 							vertices.Add(new VertexPositionCaseColor(info.Position, info.Case, info.Color));
 						}
 						vertexCount = vertices.Count;
 						if (vertexCount > 0)
 							vertexBuffer = Buffer.Create(device, BindFlags.VertexBuffer, vertices.ToArray(), vertexStride * vertexCount, ResourceUsage.Immutable, CpuAccessFlags.None, ResourceOptionFlags.None, vertexStride);
+						VertexCount = vertexCount;
+						GraphicsVertexCount = tempVertexCount;
+						TriangleCount = tempVertexCount / 3;
 						break;
 					}
 			}

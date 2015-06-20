@@ -13,6 +13,8 @@ namespace InstancingPerformance.Core
 		private float lastTime;
 		private float currentTime;
 
+		public bool Loop { get; private set; }
+
 		public PathCamera(App app)
 			: base(app)
 		{
@@ -28,8 +30,12 @@ namespace InstancingPerformance.Core
 
 		public void Update(double time)
 		{
+			Loop = false;
 			if (currentTime >= lastTime)
+			{
 				currentTime = 0;
+				Loop = true;
+			}
 			else
 				currentTime += (float)time;
 

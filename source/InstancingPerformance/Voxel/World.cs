@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using InstancingPerformance.Core;
 using InstancingPerformance.Primitives;
@@ -13,7 +14,6 @@ namespace InstancingPerformance.Voxel
 	{
 		private DrawMode drawMode;
 
-		private HashSet<Action> bufferedActions { get; }
 		private ObjectPool<Chunk, Vector3> chunkPool { get; }
 		private Dictionary<Vector3, Primitives.Chunk> map { get; }
 		private Buffer worldBuffer { get; }
@@ -35,26 +35,32 @@ namespace InstancingPerformance.Voxel
 			ChunkSize = chunkSize;
 			ViewDistance = viewDistance;
 
-			bufferedActions = new HashSet<Action>();
 			chunkPool = new ObjectPool<Chunk, Vector3>(() => new Chunk(this));
 			map = new Dictionary<Vector3, Primitives.Chunk>();
 			this.worldBuffer = worldBuffer;
 		}
 
-		public void Draw(double time)
+		public void Draw(TimeSpan totalTime, TimeSpan frameTime, double time)
 		{
-			foreach (var item in chunkPool.ActiveObjects)
+			int totalVertexCount = 0, drawnVertexCount = 0, totalTriangleCount = 0, chunkCount = 0;
+
+			foreach (var chunk in chunkPool.ActiveObjects)
 			{
-				if (item.CanDraw)
+				if (chunk.CanDraw)
 				{
-					WorldSetup.World = Matrix.Transpose(Matrix.Translation(item.WorldPosition));
+					WorldSetup.World = Matrix.Transpose(Matrix.Translation(chunk.WorldPosition));
 					DataStream data;
 					Context.MapSubresource(worldBuffer, 0, MapMode.WriteDiscard, MapFlags.None, out data);
 					using (data) data.Write(WorldSetup);
 					Context.UnmapSubresource(worldBuffer, 0);
-					item.Draw(time);
+					chunk.Draw(totalTime, frameTime, time);
+					totalVertexCount += chunk.VertexCount;
+					drawnVertexCount += chunk.GraphicsVertexCount;
+					totalTriangleCount += chunk.TriangleCount;
+					chunkCount++;
 				}
 			}
+			App.Statistics.AddRecord(frameTime, totalVertexCount, drawnVertexCount, totalTriangleCount, chunkCount);
 		}
 
 		public Block GetBlock(Vector3 position)
@@ -104,6 +110,7 @@ namespace InstancingPerformance.Voxel
 				{
 					chunkEnumerator.Current.Update(time);
 				}
+				chunkEnumerator.Dispose();
 			}
 		}
 	}

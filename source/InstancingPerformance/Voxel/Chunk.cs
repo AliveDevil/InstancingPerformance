@@ -1,9 +1,12 @@
-﻿using InstancingPerformance.Core;
+﻿using System;
+using System.Diagnostics;
+using InstancingPerformance.Core;
 using InstancingPerformance.Primitives;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using Buffer = SharpDX.Direct3D11.Buffer;
 
 namespace InstancingPerformance.Voxel
 {
@@ -46,6 +49,10 @@ namespace InstancingPerformance.Voxel
 
 		public int TriangleCount => meshData.TriangleCount;
 
+		public int VertexCount => meshData.VertexCount;
+
+		public int GraphicsVertexCount => meshData.GraphicsVertexCount;
+
 		public Vector3 WorldPosition => Position * world.ChunkSize;
 
 		public Chunk(World world)
@@ -56,7 +63,7 @@ namespace InstancingPerformance.Voxel
 			meshData.UseFace(Face, Vector3.ForwardLH);
 		}
 
-		public void Draw(double time)
+		public void Draw(TimeSpan totalTime, TimeSpan frameTime, double time)
 		{
 			if (CanDraw)
 			{

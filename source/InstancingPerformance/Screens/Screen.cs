@@ -1,4 +1,5 @@
-﻿using InstancingPerformance.Core;
+﻿using System;
+using InstancingPerformance.Core;
 
 namespace InstancingPerformance.Screens
 {
@@ -9,7 +10,7 @@ namespace InstancingPerformance.Screens
 		{
 		}
 
-		public virtual void Draw(double time)
+		public virtual void Draw(TimeSpan totalTime, TimeSpan frameTime, double time)
 		{
 		}
 
