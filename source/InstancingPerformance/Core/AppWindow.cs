@@ -65,7 +65,7 @@ namespace InstancingPerformance.Core
 				Usage = Usage.RenderTargetOutput
 			};
 
-			Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.BgraSupport | DeviceCreationFlags.Debug, swapChainDescription, out graphicsDevice, out swapChain);
+			Device.CreateWithSwapChain(DriverType.Hardware, DeviceCreationFlags.BgraSupport, swapChainDescription, out graphicsDevice, out swapChain);
 			graphicsContext = graphicsDevice.ImmediateContext;
 
 			factory = swapChain.GetParent<Factory>();

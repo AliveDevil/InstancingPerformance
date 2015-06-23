@@ -71,8 +71,10 @@
     <FxCompile Include="PixelShader.hlsl" />
     <FxCompile Include="VertexShaderBasic.hlsl" />
     <FxCompile Include="VertexShaderInstance.hlsl" />
-    <FxCompile Include="Constants.hlsl" />
     <FxCompile Include="GeometryShader.hlsl" />
     <FxCompile Include="VertexShaderGeometry.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Constants.hlsl" />
   </ItemGroup>
 </Project>
