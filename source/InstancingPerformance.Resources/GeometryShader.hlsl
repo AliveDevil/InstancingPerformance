@@ -7,6 +7,7 @@ cbuffer GSB : register(b0)
 	float4x4 Projection;
 };
 
+[instance(24)]
 [maxvertexcount(36)]
 void GS(point GSIn instances[1], inout TriangleStream<PSIn> output)
 {
