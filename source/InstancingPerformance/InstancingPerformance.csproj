@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>InstancingPerformance</RootNamespace>
     <AssemblyName>InstancingPerformance</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>21d316a5</NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -146,12 +147,6 @@
     <Compile Include="Voxel\World.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\InstancingPerformance.Resources\InstancingPerformance.Resources.vcxproj">
-      <Project>{cf6b0395-e839-4af0-a2d7-05bcecf8e9c4}</Project>
-      <Name>InstancingPerformance.Resources</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Iconshow-General-Performance.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -159,6 +154,12 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\InstancingPerformance.Resources\InstancingPerformance.Resources.vcxproj">
+      <Project>{cf6b0395-e839-4af0-a2d7-05bcecf8e9c4}</Project>
+      <Name>InstancingPerformance.Resources</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />
